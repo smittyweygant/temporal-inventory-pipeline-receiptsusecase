@@ -6,28 +6,6 @@
  * User Manual available at https://docs.gradle.org/8.0.2/userguide/building_java_projects.html
  */
 
-dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:31.1-jre'
-    implementation 'io.temporal:temporal-sdk:1.10.4' // Use the latest version available
-    testImplementation 'junit:junit:4.13.2'
-
-}
-
-application {
-    // Define the main class for the application.
-    mainClass = 'temporal.inventory.nordstorm.App'
-}
-
-tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
-}
-
-
 plugins {
     id "net.ltgt.errorprone" version "3.1.0"
     id 'com.diffplug.spotless' version '6.17.0' apply false
@@ -57,9 +35,14 @@ subprojects {
         mavenCentral()
     }
 
-    dependencies {
+   dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 
-    }
+    // This dependency is used by the application.
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'io.temporal:temporal-sdk:1.10.4' // Use the latest version available
+                  }
 
     test {
         useJUnitPlatform()
