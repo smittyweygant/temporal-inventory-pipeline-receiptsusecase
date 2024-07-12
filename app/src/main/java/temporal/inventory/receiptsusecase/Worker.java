@@ -1,4 +1,4 @@
-package temporal.inventory.nordstorm;
+package temporal.inventory.receiptsusecase;
 
 /*
  *  Copyright (c) 2020 Temporal Technologies, Inc. All Rights Reserved

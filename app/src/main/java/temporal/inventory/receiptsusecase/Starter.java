@@ -1,4 +1,4 @@
-package temporal.inventory.nordstorm;
+package temporal.inventory.receiptsusecase;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import io.temporal.client.WorkflowStub;

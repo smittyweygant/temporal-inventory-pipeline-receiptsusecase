@@ -1,4 +1,4 @@
-package temporal.inventory.nordstorm;
+package temporal.inventory.receiptsusecase;
 
 public class TransferReceiptWorkflow {
     
