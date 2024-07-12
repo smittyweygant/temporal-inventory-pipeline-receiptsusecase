@@ -6,22 +6,15 @@
  * User Manual available at https://docs.gradle.org/8.0.2/userguide/building_java_projects.html
  */
 
-plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    id 'application'
-}
-
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
-
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'io.temporal:temporal-sdk:1.10.4' // Use the latest version available
+    testImplementation 'junit:junit:4.13.2'
+
 }
 
 application {
@@ -32,4 +25,43 @@ application {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+
+plugins {
+    id "net.ltgt.errorprone" version "3.1.0"
+    id 'com.diffplug.spotless' version '6.17.0' apply false
+    id 'org.springframework.boot' version '2.7.12'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'com.diffplug.spotless'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    ext {
+        otelVersion = '1.26.0'
+        otelVersionAlpha = "${otelVersion}-alpha"
+        javaSDKVersion = '1.22.2'
+        jarVersion = '1.0.0'
+    }
+
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        mavenCentral()
+    }
+
+    dependencies {
+
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }
