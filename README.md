@@ -1,6 +1,6 @@
 ## Mock Transfer Reciept Pipeline - Nordstrom
 
-This repo is to develop workflows for Nordstrom's usecases described by EPAM here: transfer_receipt flow description here: transfer_receipt flow description and challenges
+This repo is to develop workflows for Nordstrom's usecases described by EPAM here:  transfer_receipt flow description and challenges
 
 ## Configuration
 
