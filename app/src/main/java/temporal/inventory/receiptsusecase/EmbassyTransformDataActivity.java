@@ -1,5 +1,12 @@
 package temporal.inventory.receiptsusecase;
+import io.temporal.activity.ActivityInterface;
+import io.temporal.activity.ActivityMethod;
 
-public class EmbassyTransformDataActivity {
     
+@ActivityInterface
+    
+public interface DataProcessingActivities {
+    @ActivityMethod
+    void processRecord(String eventType, String record);
 }
+  
