@@ -5,7 +5,7 @@ import io.temporal.activity.ActivityMethod;
     
 @ActivityInterface
     
-public interface DataProcessingActivities {
+public interface EmbassyTransformDataActivity {
     @ActivityMethod
     void processRecord(String eventType, String record);
 }
