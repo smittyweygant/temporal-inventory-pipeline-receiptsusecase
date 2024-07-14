@@ -1,0 +1,63 @@
+  {
+    "header": {
+      "source": {
+        "channelCountry": "US",
+        "channel": "UNKNOWN",
+        "platform": "UNKNOWN",
+        "feature": null,
+        "serviceName": null,
+        "store": null,
+        "register": null
+      },
+      "id": "aae8fac4-8b7d-4186-8d7e-76f658fa7047",
+      "correlationId": "P0000000002018374592",
+      "eventTime": "2024-06-18T07:05:53.340Z",
+      "eventType": "TRANSFER_RECEIPT",
+      "sourceTime": "2024-06-18T07:00:00Z",
+      "sourceSystem": "SCAL",
+      "fromLocation": null,
+      "toLocation": {
+        "facility": "569",
+        "logical": "568"
+      },
+      "userId": null
+    },
+    "inventoryAdjustment": null,
+    "receipt": {
+      "asnNumber": "7024941463",
+      "rmsShipmentNumber": null,
+      "supplier": "5157736",
+      "directStoreDelivery": null,
+      "receiptDetails": [
+        {
+          "operationType": "TRANSFER",
+          "initiatedBy": "RMS",
+          "cartonNumber": "20241205693124120002",
+          "receiptTime": "2024-06-18T07:00:00Z",
+          "operationNumber": "7024941463",
+          "externalReferenceNumber": null,
+          "allocationPurchaseOrderNumber": null,
+          "cartonDetails": [
+            {
+              "products": {
+                "rmsSku": {
+                  "idType": "RMS",
+                  "id": "1634509"
+                },
+                "externalSku": null
+              },
+              "quantity": 1,
+              "fromDisposition": "UNKNOWN",
+              "toDisposition": "ND_UNAVAILABLE",
+              "reasonCode": "TFRC",
+              "unitCost": null
+            }
+          ]
+        }
+      ]
+    },
+    "shipment": null,
+    "transfer": null,
+    "rtv": null,
+    "stockLedgerCorrection": null
+  }

@@ -7,6 +7,6 @@ import io.temporal.activity.ActivityMethod;
     
 public interface EmbassyTransformDataActivity {
     @ActivityMethod
-    void processRecord(String eventType, String record);
+    void processRecord(String eventType);
 }
   

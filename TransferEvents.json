@@ -1,0 +1,367 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2758
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs26 \cf0 \
+[\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "CA",\
+        "channel": "ONLINE",\
+        "platform": "WEB",\
+        "feature": "DISCOUNT",\
+        "serviceName": "EXPRESS",\
+        "store": "STORE_001",\
+        "register": "REGISTER_01"\
+      \},\
+      "id": "b2e8d9f4-3b7c-4df6-9d3e-9d41c4d78f62",\
+      "correlationId": "P0000000002018374593",\
+      "eventTime": "2024-06-19T09:15:23.450Z",\
+      "eventType": "LOGICAL_MOVE",\
+      "sourceTime": "2024-06-19T09:10:00Z",\
+      "sourceSystem": "SAP",\
+      "fromLocation": \{\
+        "facility": "123",\
+        "logical": "124"\
+      \},\
+      "toLocation": \{\
+        "facility": "125",\
+        "logical": "126"\
+      \},\
+      "userId": "user_001"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "INCREASE",\
+      "adjustmentReason": "STOCK_CORRECTION",\
+      "quantity": 10\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "UK",\
+        "channel": "STORE",\
+        "platform": "POS",\
+        "feature": "SALE",\
+        "serviceName": "STANDARD",\
+        "store": "STORE_002",\
+        "register": "REGISTER_02"\
+      \},\
+      "id": "c3f7e8d4-5c8d-4f6e-9e4d-6f72c5f8d81f",\
+      "correlationId": "P0000000002018374594",\
+      "eventTime": "2024-06-20T11:25:33.560Z",\
+      "eventType": "LOGICAL_MOVE_ADJUST",\
+      "sourceTime": "2024-06-20T11:20:00Z",\
+      "sourceSystem": "OMS",\
+      "fromLocation": \{\
+        "facility": "223",\
+        "logical": "224"\
+      \},\
+      "toLocation": \{\
+        "facility": "225",\
+        "logical": "226"\
+      \},\
+      "userId": "user_002"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "DECREASE",\
+      "adjustmentReason": "DAMAGE",\
+      "quantity": 5\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "AU",\
+        "channel": "MOBILE",\
+        "platform": "APP",\
+        "feature": "RETURN",\
+        "serviceName": "PRIORITY",\
+        "store": "STORE_003",\
+        "register": "REGISTER_03"\
+      \},\
+      "id": "d4g8f9h4-6d9e-4g7e-9f5e-7g83d6f9e82g",\
+      "correlationId": "P0000000002018374595",\
+      "eventTime": "2024-06-21T13:35:43.670Z",\
+      "eventType": "TRANSFER_RECEIPT",\
+      "sourceTime": "2024-06-21T13:30:00Z",\
+      "sourceSystem": "WMS",\
+      "fromLocation": null,\
+      "toLocation": \{\
+        "facility": "323",\
+        "logical": "324"\
+      \},\
+      "userId": "user_003"\
+    \},\
+    "inventoryAdjustment": null,\
+    "receipt": \{\
+      "asnNumber": "9025941464",\
+      "rmsShipmentNumber": "SH12345",\
+      "supplier": "6157747",\
+      "directStoreDelivery": "YES",\
+      "receiptDetails": [\
+        \{\
+          "operationType": "TRANSFER",\
+          "initiatedBy": "OMS",\
+          "cartonNumber": "20241205693124120003",\
+          "receiptTime": "2024-06-21T13:30:00Z",\
+          "operationNumber": "9025941464",\
+          "externalReferenceNumber": "EXT12345",\
+          "allocationPurchaseOrderNumber": "PO12345",\
+          "cartonDetails": [\
+            \{\
+              "products": \{\
+                "rmsSku": \{\
+                  "idType": "RMS",\
+                  "id": "2634510"\
+                \},\
+                "externalSku": "EXTSKU12345"\
+              \},\
+              "quantity": 2,\
+              "fromDisposition": "NEW",\
+              "toDisposition": "AVAILABLE",\
+              "reasonCode": "TFRC",\
+              "unitCost": 50.00\
+            \}\
+          ]\
+        \}\
+      ]\
+    \},\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "US",\
+        "channel": "WEB",\
+        "platform": "MOBILE_APP",\
+        "feature": "PROMOTION",\
+        "serviceName": "STANDARD",\
+        "store": "STORE_004",\
+        "register": "REGISTER_04"\
+      \},\
+      "id": "e5h9i0j4-7h0i-5j8i-0j6i-8i94j0k1l92k",\
+      "correlationId": "P0000000002018374596",\
+      "eventTime": "2024-06-22T14:45:53.780Z",\
+      "eventType": "LOGICAL_MOVE",\
+      "sourceTime": "2024-06-22T14:40:00Z",\
+      "sourceSystem": "ERP",\
+      "fromLocation": \{\
+        "facility": "423",\
+        "logical": "424"\
+      \},\
+      "toLocation": \{\
+        "facility": "425",\
+        "logical": "426"\
+      \},\
+      "userId": "user_004"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "INCREASE",\
+      "adjustmentReason": "REPLENISHMENT",\
+      "quantity": 20\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "DE",\
+        "channel": "STORE",\
+        "platform": "POS",\
+        "feature": "SALE",\
+        "serviceName": "STANDARD",\
+        "store": "STORE_005",\
+        "register": "REGISTER_05"\
+      \},\
+      "id": "f6i0j1k4-8i1j-6k9j-1k7j-9j05k2m3n93l",\
+      "correlationId": "P0000000002018374597",\
+      "eventTime": "2024-06-23T15:55:03.890Z",\
+      "eventType": "LOGICAL_MOVE_ADJUST",\
+      "sourceTime": "2024-06-23T15:50:00Z",\
+      "sourceSystem": "OMS",\
+      "fromLocation": \{\
+        "facility": "523",\
+        "logical": "524"\
+      \},\
+      "toLocation": \{\
+        "facility": "525",\
+        "logical": "526"\
+      \},\
+      "userId": "user_005"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "DECREASE",\
+      "adjustmentReason": "LOSS",\
+      "quantity": 15\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "JP",\
+        "channel": "MOBILE",\
+        "platform": "APP",\
+        "feature": "RETURN",\
+        "serviceName": "PRIORITY",\
+        "store": "STORE_006",\
+        "register": "REGISTER_06"\
+      \},\
+      "id": "g7j1k2l4-9j2k-7l0k-2l8k-0k16l3m4o94m",\
+      "correlationId": "P0000000002018374598",\
+      "eventTime": "2024-06-24T16:05:14.000Z",\
+      "eventType": "TRANSFER_RECEIPT",\
+      "sourceTime": "2024-06-24T16:00:00Z",\
+      "sourceSystem": "WMS",\
+      "fromLocation": null,\
+      "toLocation": \{\
+        "facility": "623",\
+        "logical": "624"\
+      \},\
+      "userId": "user_006"\
+    \},\
+    "inventoryAdjustment": null,\
+    "receipt": \{\
+      "asnNumber": "9025941465",\
+      "rmsShipmentNumber": "SH12346",\
+      "supplier": "6157748",\
+      "directStoreDelivery": "YES",\
+      "receiptDetails": [\
+        \{\
+          "operationType": "TRANSFER",\
+          "initiatedBy": "OMS",\
+          "cartonNumber": "20241205693124120004",\
+          "receiptTime": "2024-06-24T16:00:00Z",\
+          "operationNumber": "9025941465",\
+          "externalReferenceNumber": "EXT12346",\
+          "allocationPurchaseOrderNumber": "PO12346",\
+          "cartonDetails": [\
+            \{\
+              "products": \{\
+                "rmsSku": \{\
+                  "idType": "RMS",\
+                  "id": "2634511"\
+                \},\
+                "externalSku": "EXTSKU12346"\
+              \},\
+              "quantity": 3,\
+              "fromDisposition": "NEW",\
+              "toDisposition": "AVAILABLE",\
+              "reasonCode": "TFRC",\
+              "unitCost": 60.00\
+            \}\
+          ]\
+        \}\
+      ]\
+    \},\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "IN",\
+        "channel": "WEB",\
+        "platform": "MOBILE_APP",\
+        "feature": "PROMOTION",\
+        "serviceName": "STANDARD",\
+        "store": "STORE_007",\
+        "register": "REGISTER_07"\
+      \},\
+      "id": "h8k2l3m4-0k3l-8m1l-3m9l-1l27m4n5o05n",\
+      "correlationId": "P0000000002018374599",\
+      "eventTime": "2024-06-25T17:15:24.110Z",\
+      "eventType": "LOGICAL_MOVE",\
+      "sourceTime": "2024-06-25T17:10:00Z",\
+      "sourceSystem": "ERP",\
+      "fromLocation": \{\
+        "facility": "723",\
+        "logical": "724"\
+      \},\
+      "toLocation": \{\
+        "facility": "725",\
+        "logical": "726"\
+      \},\
+      "userId": "user_007"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "INCREASE",\
+      "adjustmentReason": "REPLENISHMENT",\
+      "quantity": 25\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \},\
+  \{\
+    "header": \{\
+      "source": \{\
+        "channelCountry": "BR",\
+        "channel": "STORE",\
+        "platform": "POS",\
+        "feature": "SALE",\
+        "serviceName": "STANDARD",\
+        "store": "STORE_008",\
+        "register": "REGISTER_08"\
+      \},\
+      "id": "i9l3m4n4-1l4m-9n2m-4n0m-2m38n5o6p06o",\
+      "correlationId": "P0000000002018374600",\
+      "eventTime": "2024-06-26T18:25:34.220Z",\
+      "eventType": "LOGICAL_MOVE_ADJUST",\
+      "sourceTime": "2024-06-26T18:20:00Z",\
+      "sourceSystem": "OMS",\
+      "fromLocation": \{\
+        "facility": "823",\
+        "logical": "824"\
+      \},\
+      "toLocation": \{\
+        "facility": "825",\
+        "logical": "826"\
+      \},\
+      "userId": "user_008"\
+    \},\
+    "inventoryAdjustment": \{\
+      "adjustmentType": "DECREASE",\
+      "adjustmentReason": "DAMAGE",\
+      "quantity": 30\
+    \},\
+    "receipt": null,\
+    "shipment": null,\
+    "transfer": null,\
+    "rtv": null,\
+    "stockLedgerCorrection": null\
+  \}\
+]\
+\
+}

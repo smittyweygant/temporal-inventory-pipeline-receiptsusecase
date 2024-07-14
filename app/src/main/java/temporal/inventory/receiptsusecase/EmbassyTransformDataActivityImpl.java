@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 
 public class EmbassyTransformDataActivityImpl implements EmbassyTransformDataActivity {
     @Override
-    public void processRecord(String eventType, String record) {
+    public void processRecord(String eventType) {
         // Implement your processing logic here
         System.out.println("Processing event type: " + eventType);
-        System.out.println("Record: " + record);
+        System.out.println("Routing the event to the GEO");
     }
 }

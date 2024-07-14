@@ -7,5 +7,5 @@ import java.util.List;
 @WorkflowInterface
 public interface TransferReceiptWorkflow {
   @WorkflowMethod
-  void processBatch(List<String> batch);
+  void processEvents(String eventData);
 }
