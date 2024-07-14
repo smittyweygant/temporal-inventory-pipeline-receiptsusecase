@@ -19,32 +19,34 @@ package temporal.inventory.receiptsusecase;
  *  permissions and limitations under the License.
  */
 
-
- import io.temporal.worker.WorkerFactory;
  import io.temporal.worker.WorkerOptions;
- 
- public class Worker {
- 
-   @SuppressWarnings("CatchAndPrintStackTrace")
-   public static void main(String[] args) throws Exception {
- 
-     final String TASK_QUEUE = ServerInfo.getTaskqueue();
- 
-     // set activities per second across *all* workers
-     // prevents resource exhausted errors
-     WorkerOptions options =
-         WorkerOptions.newBuilder().setMaxTaskQueueActivitiesPerSecond(150).build();
- 
-     // worker factory that can be used to create workers for specific task queues
-     WorkerFactory factory = WorkerFactory.newInstance(TemporalClient.get());
-     io.temporal.worker.Worker workerForCommonTaskQueue = factory.newWorker(TASK_QUEUE, options);
-     workerForCommonTaskQueue.registerWorkflowImplementationTypes(
-         BatchParentWorkflowImpl.class, BatchChildWorkflowImpl.class);
-     BatchActivities batchActivities = new BatchActivitiesImpl();
-     workerForCommonTaskQueue.registerActivitiesImplementations(batchActivities);
- 
-     // Start all workers created by this factory.
-     factory.start();
-     System.out.println("Worker started for task queue: " + "BatchParentWorkflowTaskQueue");
-   }
- }
+import io.temporal.worker.Worker;
+import io.temporal.worker.WorkerFactory;
+import io.temporal.client.WorkflowClient;
+import io.temporal.serviceclient.WorkflowServiceStubs;
+
+public class Worker {
+    public static void main(String[] args) {
+        // Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
+        WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+
+        // WorkflowClient can be used to start, signal, query, cancel, and terminate Workflows.
+        WorkflowClient client = WorkflowClient.newInstance(service);
+
+        // Worker factory is used to create workers for specific task queues.
+        WorkerFactory factory = WorkerFactory.newInstance(client);
+
+        // Worker is created to poll the task queue.
+        Worker worker = factory.newWorker("TRANSFER_RECEIPTS_TASK_QUEUE");
+
+        // Register the workflow implementation with the worker.
+        worker.registerWorkflowImplementationTypes(DataProcessingWorkflowImpl.class);
+
+        // Register the activity implementation with the worker.
+        worker.registerActivitiesImplementations(new DataProcessingActivitiesImpl());
+
+        // Start all the workers registered for a specific task queue.
+        factory.start();
+    }
+}
+
