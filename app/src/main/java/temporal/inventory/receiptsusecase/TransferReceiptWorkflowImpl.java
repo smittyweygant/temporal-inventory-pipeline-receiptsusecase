@@ -18,7 +18,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
     );
 
     @Override
-    public void processJson(String jsonData) {
+    public void processEvents(String eventData) {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
