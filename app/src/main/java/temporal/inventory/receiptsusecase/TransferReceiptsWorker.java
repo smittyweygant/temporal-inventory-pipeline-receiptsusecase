@@ -19,13 +19,12 @@ package temporal.inventory.receiptsusecase;
  *  permissions and limitations under the License.
  */
 
-import io.temporal.worker.WorkerOptions;
-import io.temporal.worker.Worker;
-import io.temporal.worker.WorkerFactory;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
+import io.temporal.worker.Worker;
+import io.temporal.worker.WorkerFactory;
 
-public class Worker {
+public class TransferReceiptsWorker {
     public static void main(String[] args) {
         // Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
         WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();

@@ -1,7 +1,8 @@
 package temporal.inventory.receiptsusecase;
+import java.io.IOException;
+
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
-import io.temporal.client.WorkflowStub;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 
 public class Starter {
@@ -30,13 +31,21 @@ public class Starter {
        System.out.println("Executing TransferReceiptsWorkflow");
           
 
-       String filePath = "/Users/geethaanne/Desktop/Nordstrom/transfer_receipt_payload.txt";
+       String filePath = "/Users/geethaanne/Desktop/Nordstrom/temporal-inventory-pipeline-receiptsusecase/TransferEvents.json";
 
        // Read the file content into a string
-       String eventData = FileUtils.readFileAsString(filePath); 
+      
+      
+       try {
+        String eventData = FileUtils.readFileAsString(filePath);
+        // Process eventData
+        workflow.processEvents(eventData);
+    } catch (IOException e) {
+        e.printStackTrace();
+        // Handle the exception, e.g., log it or rethrow it
+    }
        
-       workflow.processEvents(eventData);
-
+    
        System.out.println("TransferReceiptsWorkflow completed");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
         System.exit(0);
     }

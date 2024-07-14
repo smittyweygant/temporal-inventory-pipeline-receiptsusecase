@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.temporal:temporal-sdk:1.22.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    // Add other dependencies here
+}
+
+
+sourceCompatibility = '19'
+targetCompatibility = '19'
+
+task execute(type: JavaExec) {
+    mainClass = findProperty("mainClass") ?: ""
+    classpath = sourceSets.main.runtimeClasspath
+    if (project.hasProperty("arg")) {
+        args project.getProperty("arg").split("\\s+")
+    }
+}

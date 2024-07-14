@@ -1,26 +1,28 @@
 
 package temporal.inventory.receiptsusecase;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.temporal.activity.ActivityOptions;
-import io.temporal.workflow.Workflow;
-
 import java.time.Duration;
 import java.util.Iterator;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.temporal.activity.ActivityOptions;
+import io.temporal.common.RetryOptions;
+import io.temporal.workflow.Workflow;
 
 public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
 
     private final EmbassyTransformDataActivity activities = Workflow.newActivityStub(
-            EmbassyTransformDataActivity.class,
-            ActivityOptions.newBuilder()
-                    .setStartToCloseTimeout(Duration.ofMinutes(1))
-                    .setRetryOptions(
-                RetryOptions.newBuilder()
+        EmbassyTransformDataActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(1))
+            .setRetryOptions(RetryOptions.newBuilder()
                     .setMaximumAttempts(4)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
-                    .build())
-            .build();
+                    .build()
+            )
+            .build()
     );
 
     @Override
@@ -41,14 +43,14 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         "TRANSFER_RECEIPT".equals(eventType)) {
                         activities.processRecord(eventType);
                     } else {
-                        System.out.println("Unsupported event type. Skipping record.");
+                        activities.rejectRecord(eventType);
+                        
                     }
                 }
             } else {
                 System.out.println("Input JSON is not an array. Ending workflow.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }
