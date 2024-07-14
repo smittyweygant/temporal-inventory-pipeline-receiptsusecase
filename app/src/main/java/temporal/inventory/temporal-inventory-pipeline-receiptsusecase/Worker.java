@@ -19,7 +19,7 @@ package temporal.inventory.receiptsusecase;
  *  permissions and limitations under the License.
  */
 
- import io.temporal.worker.WorkerOptions;
+import io.temporal.worker.WorkerOptions;
 import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
 import io.temporal.client.WorkflowClient;
@@ -40,10 +40,10 @@ public class Worker {
         Worker worker = factory.newWorker("TRANSFER_RECEIPTS_TASK_QUEUE");
 
         // Register the workflow implementation with the worker.
-        worker.registerWorkflowImplementationTypes(DataProcessingWorkflowImpl.class);
+        worker.registerWorkflowImplementationTypes(TransferReceiptWorkflowImpl.class);
 
         // Register the activity implementation with the worker.
-        worker.registerActivitiesImplementations(new DataProcessingActivitiesImpl());
+        worker.registerActivitiesImplementations(new EmbassyTransformDataActivityImpl());
 
         // Start all the workers registered for a specific task queue.
         factory.start();
