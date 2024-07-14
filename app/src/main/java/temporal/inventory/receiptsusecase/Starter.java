@@ -37,10 +37,11 @@ public class Starter {
                 + "{ \"header\": { \"source\": { \"channelCountry\": \"JP\", \"channel\": \"MOBILE\", \"platform\": \"APP\", \"feature\": \"RETURN\", \"serviceName\": \"PRIORITY\", \"store\": \"STORE_006\", \"register\": \"REGISTER_06\" }, \"id\": \"g7j1k2l4-9j2k-7l0k-2l8k-0k16l3m4o94m\", \"correlationId\": \"P0000000002018374598\", \"eventTime\": \"2024-06-24T16:05:14.000Z\", \"eventType\": \"TRANSFER_RECEIPT\", \"sourceTime\": \"2024-06-24T16:00:00Z\", \"sourceSystem\": \"WMS\", \"fromLocation\": null, \"toLocation\": { \"facility\": \"623\", \"logical\": \"624\" }, \"userId\": \"user_006\" }, \"inventoryAdjustment\": null, \"receipt\": { \"asnNumber\": \"9025941465\",
         // Start the workflow execution
 
-       System.out.println("Executing TransferReceiptWorkflow");
+       System.out.println("Executing TransferReceiptsWorkflow");
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         workflow.processEvents(eventData);
-        
+
+       System.out.println("TransferReceiptsWorkflow completed");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
         System.exit(0);
     }
 }
