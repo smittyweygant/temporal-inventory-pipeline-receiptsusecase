@@ -2,6 +2,8 @@ plugins {
     id "net.ltgt.errorprone" version "3.1.0"
     id 'com.diffplug.spotless' version '6.17.0' apply false
     id 'org.springframework.boot' version '2.7.12'
+    id 'java'  // Ensure this line is present
+    id 'application'
 }
 
 subprojects {
@@ -29,7 +31,9 @@ subprojects {
 
     dependencies {
         implementation 'io.temporal:temporal-sdk:1.22.2'
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+        
+          implementation "com.fasterxml.jackson.core:jackson-databind"
+         implementation "com.fasterxml.jackson.core:jackson-core"
 
 
     }
