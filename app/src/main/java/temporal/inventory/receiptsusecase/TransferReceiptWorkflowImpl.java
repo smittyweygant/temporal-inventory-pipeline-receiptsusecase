@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
+import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 
 public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
@@ -21,7 +22,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
-                    .setMaximumAttempts(4)
+                    .setMaximumAttempts(10)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                     .build()
             )
@@ -33,7 +34,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
-                    .setMaximumAttempts(4)
+                    .setMaximumAttempts(10)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                     .build()
             )
@@ -46,7 +47,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
-                    .setMaximumAttempts(4)
+                    .setMaximumAttempts(14)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                     .build()
             )
@@ -58,7 +59,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
-                    .setMaximumAttempts(4)
+                    .setMaximumAttempts(14)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                     .build()
             )
@@ -81,7 +82,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
        ActivityOptions.newBuilder()
            .setStartToCloseTimeout(Duration.ofMinutes(1))
            .setRetryOptions(RetryOptions.newBuilder()
-                   .setMaximumAttempts(4)
+                   .setMaximumAttempts(14)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                    .build()
           )
@@ -92,14 +93,13 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
-                    .setMaximumAttempts(4)
+                    .setMaximumAttempts(14)
                     .setDoNotRetry(IllegalArgumentException.class.getName())
                     .build()
             )
             .build()
     );
    
-       
     
 
     @Override
@@ -127,31 +127,29 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                            // Workflow.sleep(Duration.ofSeconds(30));
                             tvactivities.processRecord(eventType);
                             
-                            String statusvalidation="VALIDATION";
-                            ssactivities.savestatus(statusvalidation);
-
-                            
                            enrichactivities.enrichData(record);
 
-                          
                            String statusenriched="ENRICHMENT";
 
-                          
                            ssactivities.savestatus(statusenriched);
 
-                           
+                           String statusvalidation="VALIDATION";
                            evalactivities.validateEvents();
+                           ssactivities.savestatus(statusvalidation);
 
-                           ;
+                           String statustranformationgeo="TRANFORMATION";
                            geotransformactivities.tranformtoeventmodel();
+                            ssactivities.savestatus(statustranformationgeo);
+                           
 
-                          
-                           publishactivities.publishEvents();
+                           String statuspublish="PUBLISHED";
+                            publishactivities.publishEvents();
+                            ssactivities.savestatus(statuspublish);
 
 
                     } else {
-                            //Async.procedure(() -> tvactivities.rejectRecord(eventType));
-                            tvactivities.rejectRecord(eventType);
+                             Async.procedure(() -> tvactivities.rejectRecord(eventType));
+                    //tvactivities.rejectRecord(eventType);
                     }
                 }
             } else {
@@ -167,12 +165,13 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
             //logger.error("Runtime exception occurred: {}", ex.getMessage(), ex);
             // Provide user-friendly feedback or rethrow a custom exception
             //throw new CustomJsonProcessingException("A runtime error occurred while processing the event data", ex);
-        }
+        //}
     }
-}
+
 
 class CustomJsonProcessingException extends RuntimeException {
     public CustomJsonProcessingException(String message, Throwable cause) {
         super(message, cause);
     }
+}
 }
