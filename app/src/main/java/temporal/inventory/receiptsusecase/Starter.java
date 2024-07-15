@@ -44,6 +44,7 @@ WorkflowClient client = WorkflowClient.newInstance(service);
         String eventData = FileUtils.readFileAsString(filePath);
         // Process eventData
        // workflow.processEvents(eventData);
+       //WorkflowClient.start(workflow::ackEvents,eventData);
        WorkflowClient.start(workflow::processEvents,eventData);
 
     } catch (IOException e) {

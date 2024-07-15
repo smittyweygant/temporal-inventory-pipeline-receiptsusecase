@@ -42,8 +42,10 @@ public class TransferReceiptsWorker {
         worker.registerWorkflowImplementationTypes(TransferReceiptWorkflowImpl.class);
 
         // Register the activity implementation with the worker.
-        worker.registerActivitiesImplementations(new EmbassyTransformDataActivityImpl());
+        worker.registerActivitiesImplementations(new EmbassyTransformValidateDataActivityImpl());
         worker.registerActivitiesImplementations(new GEOEnrichmentActivityImpl());
+        worker.registerActivitiesImplementations(new EmbassyAcknowledgeDataActivityImpl());
+        worker.registerActivitiesImplementations(new SaveStatusActivityImpl());
 
         // Start all the workers registered for a specific task queue.
         factory.start();

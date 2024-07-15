@@ -2,7 +2,7 @@ package temporal.inventory.receiptsusecase;
 
 
 import io.temporal.failure.ApplicationFailure;
-public class EmbassyTransformDataActivityImpl implements EmbassyTransformDataActivity {
+public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransformValidateDataActivity {
     // private static final Logger logger = LoggerFactory.getLogger(EmbassyTransformDataActivityImpl.class);
 
     @Override
@@ -11,7 +11,6 @@ public class EmbassyTransformDataActivityImpl implements EmbassyTransformDataAct
         System.out.println("Processing event type: " + eventType);
         //sleep(10);
         System.out.println("Routing the event to the GEO");
-
         return eventType;
 
     }

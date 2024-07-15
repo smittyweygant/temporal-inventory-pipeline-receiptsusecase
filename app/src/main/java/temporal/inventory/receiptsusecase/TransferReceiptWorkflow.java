@@ -8,4 +8,5 @@ import io.temporal.workflow.WorkflowMethod;
 public interface TransferReceiptWorkflow {
   @WorkflowMethod
   void processEvents(String eventData);
+
 }

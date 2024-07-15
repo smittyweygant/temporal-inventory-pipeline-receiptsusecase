@@ -1,0 +1,31 @@
+package temporal.inventory.receiptsusecase;
+import io.temporal.failure.ApplicationFailure;
+
+public class EmbassyAcknowledgeDataActivityImpl implements EmbassyAcknowledgeDataActivity {
+
+    @Override
+    public String ackEvents(String eventData){
+          
+        if (eventData != null && !eventData.isEmpty()) {
+            // The events are not empty
+            System.out.println("Event consumed from Kafka");
+            //WorkflowUtils.saveStatustoDB("ACKNOWLEDGEMENT");
+            
+            //if (!WorkflowUtils.isIsAcknowledgementSaved()) 
+           // { 
+               // throw new RuntimeException("ACKNOWLEDGEMENT status was not saved to the database");
+           //  }
+
+
+            return "Event consumed from Kafka";
+            
+        } else {
+            // The string is empty or null
+            System.out.println("Event not consumed from Kafka");
+            Exception e = new RuntimeException(" Intentionally failing the workflow due to no data consumed from kafka. ");
+       throw ApplicationFailure.newNonRetryableFailure(e.getMessage(), e.getClass().getName());
+    }
+            
+}
+
+}

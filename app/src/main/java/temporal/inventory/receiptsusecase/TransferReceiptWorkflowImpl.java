@@ -15,11 +15,23 @@ import io.temporal.common.RetryOptions;
 import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 
-
 public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
     private static final Logger logger = LoggerFactory.getLogger(TransferReceiptWorkflowImpl.class);
-    private final EmbassyTransformDataActivity ackactivities = Workflow.newActivityStub(
-        EmbassyTransformDataActivity.class,
+    private final EmbassyTransformValidateDataActivity tvactivities = Workflow.newActivityStub(
+        EmbassyTransformValidateDataActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(1))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setMaximumAttempts(4)
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                    .build()
+            )
+            .build()
+    );
+
+
+    private final SaveStatusActivity ssactivities = Workflow.newActivityStub(
+        SaveStatusActivity.class,
         ActivityOptions.newBuilder()
             .setStartToCloseTimeout(Duration.ofMinutes(1))
             .setRetryOptions(RetryOptions.newBuilder()
@@ -40,12 +52,32 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
           )
           .build()
     );
+    private final  EmbassyAcknowledgeDataActivity ackactivities = Workflow.newActivityStub(
+        EmbassyAcknowledgeDataActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(1))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setMaximumAttempts(4)
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                    .build()
+            )
+            .build()
+    );
    
+       
+    
+
     @Override
     public void processEvents(String eventData) {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
+
+           
+            ackactivities.ackEvents(eventData);
+            String status="ACKNOWLEDGEMENT";
+            ssactivities.savestatus(status);
+
             JsonNode rootNode = objectMapper.readTree(eventData);
 
             if (rootNode.isArray()) {
@@ -57,12 +89,19 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                     if ("LOGICAL_MOVE".equals(eventType) || 
                         "LOGICAL_MOVE_ADJUST".equals(eventType) || 
                         "TRANSFER_RECEIPT".equals(eventType)) {
-                            Workflow.sleep(Duration.ofSeconds(60));
-                            ackactivities.processRecord(eventType);
-                            Workflow.sleep(Duration.ofSeconds(60));
+                            Workflow.sleep(Duration.ofSeconds(30));
+                            tvactivities.processRecord(eventType);
+                            
+                            String statusvalidation="VALIDATION";
+                            ssactivities.savestatus(statusvalidation);
+                            Workflow.sleep(Duration.ofSeconds(20));
                            enrichactivities.enrichData(record);
+                           Workflow.sleep(Duration.ofSeconds(20));
+                           String statusenriched="ENRICHMENT";
+                           ssactivities.savestatus(statusenriched);
+
                     } else {
-                            Async.procedure(() -> ackactivities.rejectRecord(eventType));
+                            Async.procedure(() -> tvactivities.rejectRecord(eventType));
                       
                     }
                 }
