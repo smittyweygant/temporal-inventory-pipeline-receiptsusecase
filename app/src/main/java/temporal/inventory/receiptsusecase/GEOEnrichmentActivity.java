@@ -1,13 +1,14 @@
 package temporal.inventory.receiptsusecase;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
-
     
 @ActivityInterface
     
-public interface EmbassyTransformDataActivity {
+public interface GEOEnrichmentActivity{
     @ActivityMethod
-    String processRecord(String eventType);
-    void rejectRecord(String eventType);
+    JsonNode enrichData(JsonNode record);
+    
 }
-  
+ 

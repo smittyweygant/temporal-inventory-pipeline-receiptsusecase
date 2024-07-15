@@ -6,26 +6,30 @@ import io.temporal.client.WorkflowOptions;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 
 public class Starter {
-    public static void main(String[] args) {
-        // Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
-        WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+    @SuppressWarnings("CatchAndPrintStackTrace")
+  public static void main(String[] args) throws Exception { 
+   // runWorkflow();
+    //System.exit(0);
+  //}
+  //public static String runWorkflow() throws FileNotFoundException, SSLException {
+    // generate a random reference number
 
-        // WorkflowClient can be used to start, signal, query, cancel, and terminate Workflows.
-        WorkflowClient client = WorkflowClient.newInstance(service);
+    // Workflow execution code
+// Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
+WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
 
-        // Define the workflow unique id
-        String workflowId = "TransferReceiptWorkflow";
+// WorkflowClient can be used to start, signal, query, cancel, and terminate Workflows.
+WorkflowClient client = WorkflowClient.newInstance(service);
 
-        // Define our workflow options
-        WorkflowOptions options = WorkflowOptions.newBuilder()
-                .setWorkflowId(workflowId)
-                .setTaskQueue("TRANSFER_RECEIPTS_TASK_QUEUE")
-                .build();
-
-        // Create the workflow client stub.
-        TransferReceiptWorkflow workflow = client.newWorkflowStub(TransferReceiptWorkflow.class, options);
-        
-     
+// Define the workflow unique id
+    WorkflowOptions options =
+        WorkflowOptions.newBuilder()
+            .setWorkflowId("TransferReceiptWorkflow")
+            .setTaskQueue("TRANSFER_RECEIPTS_TASK_QUEUE")
+            .build();
+    // Create the workflow client stub.
+    TransferReceiptWorkflow workflow = client.newWorkflowStub(TransferReceiptWorkflow.class, options);
+   
     // Start the workflow execution
 
        System.out.println("Executing TransferReceiptsWorkflow");
@@ -39,14 +43,15 @@ public class Starter {
        try {
         String eventData = FileUtils.readFileAsString(filePath);
         // Process eventData
-        workflow.processEvents(eventData);
+       // workflow.processEvents(eventData);
+       WorkflowClient.start(workflow::processEvents,eventData);
+
     } catch (IOException e) {
-        e.printStackTrace();
-        // Handle the exception, e.g., log it or rethrow it
+    // Handle the exception, e.g., log it or rethrow it
+
     }
-       
-    
-       System.out.println("TransferReceiptsWorkflow completed");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+       // System.out.println("TransferReceiptsWorkflow completed");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
         System.exit(0);
-    }
+        //return null;
+}  
 }
