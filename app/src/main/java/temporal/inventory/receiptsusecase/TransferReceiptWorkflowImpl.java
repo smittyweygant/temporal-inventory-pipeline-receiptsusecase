@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
-import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 
 public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
@@ -125,34 +124,34 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                     if ("LOGICAL_MOVE".equals(eventType) || 
                         "LOGICAL_MOVE_ADJUST".equals(eventType) || 
                         "TRANSFER_RECEIPT".equals(eventType)) {
-                            Workflow.sleep(Duration.ofSeconds(30));
+                           // Workflow.sleep(Duration.ofSeconds(30));
                             tvactivities.processRecord(eventType);
                             
                             String statusvalidation="VALIDATION";
                             ssactivities.savestatus(statusvalidation);
 
-                            Workflow.sleep(Duration.ofSeconds(20));
+                            
                            enrichactivities.enrichData(record);
 
-                           Workflow.sleep(Duration.ofSeconds(20));
+                          
                            String statusenriched="ENRICHMENT";
 
-                           Workflow.sleep(Duration.ofSeconds(20));
+                          
                            ssactivities.savestatus(statusenriched);
 
-                           Workflow.sleep(Duration.ofSeconds(20));
+                           
                            evalactivities.validateEvents();
 
-                           Workflow.sleep(Duration.ofSeconds(20));
+                           ;
                            geotransformactivities.tranformtoeventmodel();
 
-                           Workflow.sleep(Duration.ofSeconds(20));
+                          
                            publishactivities.publishEvents();
 
 
                     } else {
-                            Async.procedure(() -> tvactivities.rejectRecord(eventType));
-                      
+                            //Async.procedure(() -> tvactivities.rejectRecord(eventType));
+                            tvactivities.rejectRecord(eventType);
                     }
                 }
             } else {
@@ -163,11 +162,11 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
             logger.error("Failed to process JSON: {}", ex.getMessage(), ex);
             // Provide user-friendly feedback or rethrow a custom exception
             throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
-        } catch (RuntimeException ex) {
+        } //catch (RuntimeException ex) {
             // Handle other runtime exceptions
-            logger.error("Runtime exception occurred: {}", ex.getMessage(), ex);
+            //logger.error("Runtime exception occurred: {}", ex.getMessage(), ex);
             // Provide user-friendly feedback or rethrow a custom exception
-            throw new CustomJsonProcessingException("A runtime error occurred while processing the event data", ex);
+            //throw new CustomJsonProcessingException("A runtime error occurred while processing the event data", ex);
         }
     }
 }

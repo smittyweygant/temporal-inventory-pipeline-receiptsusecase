@@ -16,7 +16,7 @@ public class EmbassyAcknowledgeDataActivityImpl implements EmbassyAcknowledgeDat
                // throw new RuntimeException("ACKNOWLEDGEMENT status was not saved to the database");
            //  }
 
-
+            sleep(2);
             return "Event consumed from Kafka";
             
         } else {
@@ -27,5 +27,15 @@ public class EmbassyAcknowledgeDataActivityImpl implements EmbassyAcknowledgeDat
     }
             
 }
+private void sleep(int seconds) {
+    try {
+        // a random number between 800 and 1200
+        // to simulate variance in API call time
+        long sleepTime = (long) (Math.random() * 400) + 800;
 
+        Thread.sleep(seconds * sleepTime);
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+}
 }
