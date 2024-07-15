@@ -46,6 +46,11 @@ public class TransferReceiptsWorker {
         worker.registerActivitiesImplementations(new GEOEnrichmentActivityImpl());
         worker.registerActivitiesImplementations(new EmbassyAcknowledgeDataActivityImpl());
         worker.registerActivitiesImplementations(new SaveStatusActivityImpl());
+        worker.registerActivitiesImplementations(new GEOValidateDataActivityImpl());
+        worker.registerActivitiesImplementations(new GEOTransformModelActivityImpl());
+        worker.registerActivitiesImplementations(new PublishActivityImpl());
+
+
 
         // Start all the workers registered for a specific task queue.
         factory.start();

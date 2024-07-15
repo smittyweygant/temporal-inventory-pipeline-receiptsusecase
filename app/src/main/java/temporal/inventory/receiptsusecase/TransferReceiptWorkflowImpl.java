@@ -29,6 +29,30 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
             .build()
     );
 
+    private final GEOValidateDataActivity evalactivities = Workflow.newActivityStub(
+        GEOValidateDataActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(1))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setMaximumAttempts(4)
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                    .build()
+            )
+            .build()
+    );
+
+
+    private final GEOTransformModelActivity geotransformactivities = Workflow.newActivityStub(
+        GEOTransformModelActivity.class,
+        ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(1))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setMaximumAttempts(4)
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                    .build()
+            )
+            .build()
+    );
 
     private final SaveStatusActivity ssactivities = Workflow.newActivityStub(
         SaveStatusActivity.class,
@@ -43,6 +67,18 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
     );
     private final GEOEnrichmentActivity enrichactivities = Workflow.newActivityStub(
         GEOEnrichmentActivity.class,
+       ActivityOptions.newBuilder()
+           .setStartToCloseTimeout(Duration.ofMinutes(1))
+           .setRetryOptions(RetryOptions.newBuilder()
+                   .setMaximumAttempts(4)
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                   .build()
+          )
+          .build()
+    );
+
+    private final PublishActivity publishactivities = Workflow.newActivityStub(
+        PublishActivity.class,
        ActivityOptions.newBuilder()
            .setStartToCloseTimeout(Duration.ofMinutes(1))
            .setRetryOptions(RetryOptions.newBuilder()
@@ -94,11 +130,25 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                             
                             String statusvalidation="VALIDATION";
                             ssactivities.savestatus(statusvalidation);
+
                             Workflow.sleep(Duration.ofSeconds(20));
                            enrichactivities.enrichData(record);
+
                            Workflow.sleep(Duration.ofSeconds(20));
                            String statusenriched="ENRICHMENT";
+
+                           Workflow.sleep(Duration.ofSeconds(20));
                            ssactivities.savestatus(statusenriched);
+
+                           Workflow.sleep(Duration.ofSeconds(20));
+                           evalactivities.validateEvents();
+
+                           Workflow.sleep(Duration.ofSeconds(20));
+                           geotransformactivities.tranformtoeventmodel();
+
+                           Workflow.sleep(Duration.ofSeconds(20));
+                           publishactivities.publishEvents();
+
 
                     } else {
                             Async.procedure(() -> tvactivities.rejectRecord(eventType));

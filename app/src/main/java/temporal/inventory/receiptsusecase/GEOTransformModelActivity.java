@@ -1,14 +1,11 @@
+
 package temporal.inventory.receiptsusecase;
-
-
-
-
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 
 @ActivityInterface
-public interface GEOValidateDataActivity {
+public interface GEOTransformModelActivity {
     @ActivityMethod
-    String validateEvents();
+    String tranformtoeventmodel();
     
 }
