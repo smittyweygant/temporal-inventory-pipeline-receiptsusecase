@@ -40,6 +40,7 @@ public class TransferReceiptsWorker {
         Worker worker = factory.newWorker("TRANSFER_RECEIPTS_TASK_QUEUE");
 
         // Register the workflow implementation with the worker.
+        worker.registerWorkflowImplementationTypes(TransferMessageWorkflowImpl.class);
         worker.registerWorkflowImplementationTypes(TransferReceiptWorkflowImpl.class);
 
         // Register the activity implementation with the worker.

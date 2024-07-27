@@ -21,7 +21,7 @@ public class GEOEnrichmentActivityImpl implements GEOEnrichmentActivity {
             // Implement your processing logic here
 
             System.out.println("GEO Enriching the record with Location and Item :");
-            sleep(5);
+            sleep(1);
             ((ObjectNode) record).put("location", "New York");
             ((ObjectNode) record).put("item", "DiorBag");
 

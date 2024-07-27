@@ -14,16 +14,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
 import io.temporal.common.SearchAttributeKey;
-import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 
 public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         
         // set up logger
         private static final Logger log = LoggerFactory.getLogger(TransferReceiptWorkflowImpl.class);
-  
+
         // transfer state stored in a local object and status pushed to Temporal Advanced Visibility
-        static final SearchAttributeKey<String> TRANSFER_STATUS = SearchAttributeKey.forKeyword("TRANSFER_STATUS");
+        static final SearchAttributeKey<String> TRANSFER_EVENT_TYPE = SearchAttributeKey.forKeyword("TRANSFER_EVENT_TYPE");
+        static final SearchAttributeKey<String> TRANSFER_EVENT_STATUS = SearchAttributeKey.forKeyword("TRANSFER_EVENT_STATUS");
+        static final SearchAttributeKey<String> CORRELATION_ID = SearchAttributeKey.forKeyword("CORRELATION_ID");
+
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
                 .setStartToCloseTimeout(Duration.ofSeconds(30))
@@ -32,7 +34,6 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         .setDoNotRetry(IllegalArgumentException.class.getName())
                         .build())
                 .build();
-        
         
         // Activity stubs
 
@@ -62,54 +63,85 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 try {
+                        System.out.println("Processing Receipt Event - Child WF");
+                        System.out.println("Input String:" + eventData);
 
-                        ackactivities.ackEvents(eventData);
                         String status = "ACKNOWLEDGEMENT";
                         ssactivities.savestatus(status);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
+                        
+                        // Parse and process transfer record
+                        JsonNode record = objectMapper.readTree(eventData);
+                        String eventType = record.path("header").path("eventType").asText();
+                        String correlationId = record.path("header").path("correlationId").asText();
+                        Workflow.upsertTypedSearchAttributes(CORRELATION_ID.valueSet(correlationId));
 
-                        JsonNode rootNode = objectMapper.readTree(eventData);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_TYPE.valueSet(eventType));
+                        tvactivities.processRecord(eventType);
 
-                        if (rootNode.isArray()) {
-                                Iterator<JsonNode> records = rootNode.elements();
-                                while (records.hasNext()) {
-                                        JsonNode record = records.next();
-                                        String eventType = record.path("header").path("eventType").asText();
+                        status = "ENRICHMENT";
+                        enrichactivities.enrichData(record);
+                        ssactivities.savestatus(status);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                                        if ("LOGICAL_MOVE".equals(eventType) ||
-                                                        "LOGICAL_MOVE_ADJUST".equals(eventType) ||
-                                                        "TRANSFER_RECEIPT".equals(eventType)) {
-                                                // Workflow.sleep(Duration.ofSeconds(30));
+                        status = "VALIDATION";
+                        evalactivities.validateEvents();
+                        ssactivities.savestatus(status);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                                                // Transfer Receipt Pipeline Workflow logic
+                        status = "TRANFORMATION";
+                        geotransformactivities.tranformtoeventmodel();
+                        ssactivities.savestatus(status);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                                                tvactivities.processRecord(eventType);
+                        status = "PUBLISHED";
+                        publishactivities.publishEvents();
+                        ssactivities.savestatus(status);
+                        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                                                enrichactivities.enrichData(record);
+                        
 
-                                                String statusenriched = "ENRICHMENT";
+                        // if (rootNode.isArray()) {
+                        //         Iterator<JsonNode> records = rootNode.elements();
+                        //         while (records.hasNext()) {
+                        //                 JsonNode record = records.next();
+                        //                 String eventType = record.path("header").path("eventType").asText();
 
-                                                ssactivities.savestatus(statusenriched);
+                        //                 if ("LOGICAL_MOVE".equals(eventType) ||
+                        //                                 "LOGICAL_MOVE_ADJUST".equals(eventType) ||
+                        //                                 "TRANSFER_RECEIPT".equals(eventType)) {
+                        //                         // Workflow.sleep(Duration.ofSeconds(30));
 
-                                                String statusvalidation = "VALIDATION";
-                                                evalactivities.validateEvents();
-                                                ssactivities.savestatus(statusvalidation);
+                        //                         // Transfer Receipt Pipeline Workflow logic
 
-                                                String statustranformationgeo = "TRANFORMATION";
-                                                geotransformactivities.tranformtoeventmodel();
-                                                ssactivities.savestatus(statustranformationgeo);
+                        //                         tvactivities.processRecord(eventType);
 
-                                                String statuspublish = "PUBLISHED";
-                                                publishactivities.publishEvents();
-                                                ssactivities.savestatus(statuspublish);
+                        //                         enrichactivities.enrichData(record);
 
-                                        } else {
-                                                Async.procedure(() -> tvactivities.rejectRecord(eventType));
-                                                // tvactivities.rejectRecord(eventType);
-                                        }
-                                }
-                        } else {
-                                System.out.println("Input JSON is not an array. Ending workflow.");
-                        }
+                        //                         String statusenriched = "ENRICHMENT";
+
+                        //                         ssactivities.savestatus(statusenriched);
+
+                        //                         String statusvalidation = "VALIDATION";
+                        //                         evalactivities.validateEvents();
+                        //                         ssactivities.savestatus(statusvalidation);
+
+                        //                         String statustranformationgeo = "TRANFORMATION";
+                        //                         geotransformactivities.tranformtoeventmodel();
+                        //                         ssactivities.savestatus(statustranformationgeo);
+
+                        //                         String statuspublish = "PUBLISHED";
+                        //                         publishactivities.publishEvents();
+                        //                         ssactivities.savestatus(statuspublish);
+
+                        //                 } else {
+                        //                         Async.procedure(() -> tvactivities.rejectRecord(eventType));
+                        //                         // tvactivities.rejectRecord(eventType);
+                        //                 }
+                        //         }
+                        // } else {
+                        //         System.out.println("Input JSON is not an array. Ending workflow.");
+                        // }
                 } catch (JsonProcessingException ex) {
                         // Handle JSON processing exceptions
                         log.error("Failed to process JSON: {}", ex.getMessage(), ex);

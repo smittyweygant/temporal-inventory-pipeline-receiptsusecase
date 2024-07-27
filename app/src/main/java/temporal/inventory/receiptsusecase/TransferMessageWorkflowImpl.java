@@ -12,18 +12,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.temporal.activity.ActivityOptions;
+import io.temporal.api.enums.v1.ParentClosePolicy;
 import io.temporal.common.RetryOptions;
 import io.temporal.common.SearchAttributeKey;
 import io.temporal.workflow.Async;
+import io.temporal.workflow.ChildWorkflowOptions;
 import io.temporal.workflow.Workflow;
 
-public class TransferMessageImpl implements TransferMessageWorkflow {
+public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
         
         // set up logger
-        private static final Logger log = LoggerFactory.getLogger(TransferReceiptWorkflowImpl.class);
+        private static final Logger log = LoggerFactory.getLogger(TransferMessageWorkflowImpl.class);
   
         // transfer state stored in a local object and status pushed to Temporal Advanced Visibility
-        static final SearchAttributeKey<String> TRANSFER_STATUS = SearchAttributeKey.forKeyword("TRANSFER_STATUS");
+        static final SearchAttributeKey<String> TRANSFER_EVENT_STATUS = SearchAttributeKey.forKeyword("TRANSFER_EVENT_STATUS");
+        
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
                 .setStartToCloseTimeout(Duration.ofSeconds(30))
@@ -36,33 +39,20 @@ public class TransferMessageImpl implements TransferMessageWorkflow {
         
         // Activity stubs
 
+        private final EmbassyAcknowledgeDataActivity ackactivities = Workflow.newActivityStub(
+                        EmbassyAcknowledgeDataActivity.class, options);
+
         private final EmbassyTransformValidateDataActivity tvactivities = Workflow.newActivityStub(
                 EmbassyTransformValidateDataActivity.class, options);
 
-        private final GEOValidateDataActivity evalactivities = Workflow.newActivityStub(
-                        GEOValidateDataActivity.class, options);
-
-        private final GEOTransformModelActivity geotransformactivities = Workflow.newActivityStub(
-                        GEOTransformModelActivity.class, options);
-
         private final SaveStatusActivity ssactivities = Workflow.newActivityStub(
-                        SaveStatusActivity.class, options);
-                        
-        private final GEOEnrichmentActivity enrichactivities = Workflow.newActivityStub(
-                        GEOEnrichmentActivity.class, options);
-
-        private final PublishActivity publishactivities = Workflow.newActivityStub(
-                        PublishActivity.class, options);
-                        
-        private final EmbassyAcknowledgeDataActivity ackactivities = Workflow.newActivityStub(
-                        EmbassyAcknowledgeDataActivity.class, options);
+                SaveStatusActivity.class, options);
 
         @Override
         public void processEvents(String eventData) {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 try {
-
                         ackactivities.ackEvents(eventData);
                         String status = "ACKNOWLEDGEMENT";
                         ssactivities.savestatus(status);
@@ -74,33 +64,24 @@ public class TransferMessageImpl implements TransferMessageWorkflow {
                                 while (records.hasNext()) {
                                         JsonNode record = records.next();
                                         String eventType = record.path("header").path("eventType").asText();
+                                        String requestId = record.path("header").path("id").asText();
+                                        String correlationId = record.path("header").path("correlationId").asText();
 
                                         if ("LOGICAL_MOVE".equals(eventType) ||
                                                         "LOGICAL_MOVE_ADJUST".equals(eventType) ||
                                                         "TRANSFER_RECEIPT".equals(eventType)) {
                                                 // Workflow.sleep(Duration.ofSeconds(30));
 
-                                                // Transfer Receipt Pipeline Workflow logic
-
-                                                tvactivities.processRecord(eventType);
-
-                                                enrichactivities.enrichData(record);
-
-                                                String statusenriched = "ENRICHMENT";
-
-                                                ssactivities.savestatus(statusenriched);
-
-                                                String statusvalidation = "VALIDATION";
-                                                evalactivities.validateEvents();
-                                                ssactivities.savestatus(statusvalidation);
-
-                                                String statustranformationgeo = "TRANFORMATION";
-                                                geotransformactivities.tranformtoeventmodel();
-                                                ssactivities.savestatus(statustranformationgeo);
-
-                                                String statuspublish = "PUBLISHED";
-                                                publishactivities.publishEvents();
-                                                ssactivities.savestatus(statuspublish);
+                                                // Start a child workflow to process transfer event activities
+                                                ChildWorkflowOptions childWorkflowOptions =
+                                                        ChildWorkflowOptions.newBuilder()
+                                                        .setWorkflowId("Transfer-Receipt-" + requestId)
+                                                        .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
+                                                        .build();
+                                                TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(TransferReceiptWorkflow.class, childWorkflowOptions);
+                                                
+                                                System.out.println("Processing Receipt Event");
+                                                receiptChildWorkflow.processEvents(record.toString());
 
                                         } else {
                                                 Async.procedure(() -> tvactivities.rejectRecord(eventType));
@@ -115,13 +96,11 @@ public class TransferMessageImpl implements TransferMessageWorkflow {
                         log.error("Failed to process JSON: {}", ex.getMessage(), ex);
                         // Provide user-friendly feedback or rethrow a custom exception
                         throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
-                } // catch (RuntimeException ex) {
-                  // Handle other runtime exceptions
-                  // log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
-                  // Provide user-friendly feedback or rethrow a custom exception
-                  // throw new CustomJsonProcessingException("A runtime error occurred while
-                  // processing the event data", ex);
-                  // }
+                } 
+                // Handle other runtime exceptions
+                catch (RuntimeException ex) {
+                log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
+                }
         }
 
         class CustomJsonProcessingException extends RuntimeException {

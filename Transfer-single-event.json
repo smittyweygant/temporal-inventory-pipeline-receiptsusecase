@@ -1,0 +1,38 @@
+{
+    "header": {
+        "source": {
+            "channelCountry": "BR",
+            "channel": "STORE",
+            "platform": "POS",
+            "feature": "SALE",
+            "serviceName": "STANDARD",
+            "store": "STORE_008",
+            "register": "REGISTER_08"
+        },
+        "id": "i9l3m4n4-1l4m-9n2m-4n0m-2m38n5o6p06o",
+        "correlationId": "P0000000002018374600",
+        "eventTime": "2024-06-26T18:25:34.220Z",
+        "eventType": "LOGICAL_MOVE_ADJUST",
+        "sourceTime": "2024-06-26T18:20:00Z",
+        "sourceSystem": "OMS",
+        "fromLocation": {
+            "facility": "823",
+            "logical": "824"
+        },
+        "toLocation": {
+            "facility": "825",
+            "logical": "826"
+        },
+        "userId": "user_008"
+    },
+    "inventoryAdjustment": {
+        "adjustmentType": "DECREASE",
+        "adjustmentReason": "DAMAGE",
+        "quantity": 30
+    },
+    "receipt": null,
+    "shipment": null,
+    "transfer": null,
+    "rtv": null,
+    "stockLedgerCorrection": null
+}
