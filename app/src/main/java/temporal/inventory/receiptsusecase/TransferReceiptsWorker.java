@@ -27,7 +27,8 @@ import io.temporal.worker.WorkerFactory;
 public class TransferReceiptsWorker {
     public static void main(String[] args) {
         // Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
-        WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+        // WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+        WorkflowServiceStubs service = WorkflowServiceStubs.newLocalServiceStubs();
 
         // WorkflowClient can be used to start, signal, query, cancel, and terminate Workflows.
         WorkflowClient client = WorkflowClient.newInstance(service);

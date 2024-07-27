@@ -14,10 +14,10 @@ public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransfor
        //try {
         System.out.println("Processing event type: " + eventType);
         //sleep(2);
-       System.out.println("Routing the event to the GEO");
+        System.out.println("Routing the event to the GEO");
 
       //logger.info("\n\nSimulating Processing activity failure.\n\n");
-      // throw new RuntimeException("Error causing the processing mismacthed record");
+      // throw new RuntimeException("Error causing the processing mismatched record");
     
 
 
@@ -27,7 +27,7 @@ public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransfor
 
 
         //logger.info("\n\nSimulating Processing activity failure.\n\n");
-        // throw new RuntimeException("Error causing the processing mismacthed record");
+        // throw new RuntimeException("Error causing the processing mismatched record");
     
         
 

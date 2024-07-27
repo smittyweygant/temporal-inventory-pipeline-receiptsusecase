@@ -22,3 +22,12 @@ Temporal Workflow that orchestrates the underlying APIs, ultimately flushing to 
 2.TransferReceiptSupervisor
 A Temporal Workflow with one activity...a consumer of the Kafka topic that routes/starts TransferReceipt Workflows.
 
+## Demo Script
+
+# Run worker
+./gradlew -q execute -PmainClass=temporal.inventory.receiptsusecase.TransferReceiptsWorker --console=plain
+
+# Run starter
+./gradlew -q execute -PmainClass=temporal.inventory.receiptsusecase.Starter --console=plain
+
+

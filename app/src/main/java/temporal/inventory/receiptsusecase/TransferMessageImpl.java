@@ -17,7 +17,7 @@ import io.temporal.common.SearchAttributeKey;
 import io.temporal.workflow.Async;
 import io.temporal.workflow.Workflow;
 
-public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
+public class TransferMessageImpl implements TransferMessageWorkflow {
         
         // set up logger
         private static final Logger log = LoggerFactory.getLogger(TransferReceiptWorkflowImpl.class);
