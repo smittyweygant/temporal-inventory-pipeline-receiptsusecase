@@ -1,5 +1,8 @@
 package temporal.inventory.receiptsusecase;
 
+import org.springframework.stereotype.Component;
+
+@Component("save-status-activity")
 public class SaveStatusActivityImpl implements SaveStatusActivity{
     
    @Override

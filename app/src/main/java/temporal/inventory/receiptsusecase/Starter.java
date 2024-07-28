@@ -35,7 +35,7 @@ WorkflowClient client = WorkflowClient.newInstance(service);
        System.out.println("Executing TransferReceiptWorkflow");
           
 
-       String filePath = "/Users/smittyweygant/Development/temporalio/demos/temporal-inventory-pipeline-receiptsusecase/TransferEvents.json";
+  String filePath = "./TransferEvents.json";
 
        // Read the file content into a string
       

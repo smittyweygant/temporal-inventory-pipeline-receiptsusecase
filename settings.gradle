@@ -9,3 +9,6 @@
 
 rootProject.name = 'temporal-inventory-pipeline-receiptsusecase'
 include('app')
+include 'app:src:test'
+findProject(':app:src:test')?.name = 'test'
+

@@ -1,5 +1,8 @@
 package temporal.inventory.receiptsusecase;
 
+import org.springframework.stereotype.Component;
+
+@Component("geo-validate-data-activity")
 public class GEOValidateDataActivityImpl implements GEOValidateDataActivity{
     
    @Override

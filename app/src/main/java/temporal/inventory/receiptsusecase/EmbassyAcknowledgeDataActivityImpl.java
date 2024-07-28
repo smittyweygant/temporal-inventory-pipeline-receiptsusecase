@@ -1,6 +1,8 @@
 package temporal.inventory.receiptsusecase;
 import io.temporal.failure.ApplicationFailure;
+import org.springframework.stereotype.Component;
 
+@Component("embassy-acknowledge-data-activity")
 public class EmbassyAcknowledgeDataActivityImpl implements EmbassyAcknowledgeDataActivity {
 
     @Override

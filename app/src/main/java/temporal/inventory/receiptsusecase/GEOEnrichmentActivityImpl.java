@@ -9,7 +9,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.stereotype.Component;
 
+@Component("geo-enrichment-activity")
 public class GEOEnrichmentActivityImpl implements GEOEnrichmentActivity {
 
     private static final Logger logger = LoggerFactory.getLogger(GEOEnrichmentActivityImpl.class);
