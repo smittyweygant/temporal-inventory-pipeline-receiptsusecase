@@ -16,7 +16,7 @@ public class Starter {
 
     // Workflow execution code
 // Create a gRPC stubs wrapper that talks to the local Docker instance of Temporal service.
-WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+WorkflowServiceStubs service = WorkflowServiceStubs.newLocalServiceStubs();
 
 // WorkflowClient can be used to start, signal, query, cancel, and terminate Workflows.
 WorkflowClient client = WorkflowClient.newInstance(service);
@@ -24,7 +24,7 @@ WorkflowClient client = WorkflowClient.newInstance(service);
 // Define the workflow unique id
     WorkflowOptions options =
         WorkflowOptions.newBuilder()
-            .setWorkflowId("TransferReceiptWorkflow")
+            .setWorkflowId("TransferReceipt")
             .setTaskQueue("TRANSFER_RECEIPTS_TASK_QUEUE")
             .build();
     // Create the workflow client stub.
@@ -32,10 +32,10 @@ WorkflowClient client = WorkflowClient.newInstance(service);
    
     // Start the workflow execution
 
-       System.out.println("Executing TransferReceiptsWorkflow");
+       System.out.println("Executing TransferReceiptWorkflow");
           
 
-       String filePath = "/Users/mnichols/dev/temporal-inventory-pipeline-receiptsusecase/TransferEvents.json";
+  String filePath = "./TransferEvents.json";
 
        // Read the file content into a string
       

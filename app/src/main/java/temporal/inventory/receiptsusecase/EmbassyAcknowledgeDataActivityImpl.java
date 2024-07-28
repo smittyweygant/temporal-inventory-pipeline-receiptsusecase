@@ -11,13 +11,6 @@ public class EmbassyAcknowledgeDataActivityImpl implements EmbassyAcknowledgeDat
         if (eventData != null && !eventData.isEmpty()) {
             // The events are not empty
             System.out.println("Event consumed from Kafka");
-            //WorkflowUtils.saveStatustoDB("ACKNOWLEDGEMENT");
-            
-            //if (!WorkflowUtils.isIsAcknowledgementSaved()) 
-           // { 
-               // throw new RuntimeException("ACKNOWLEDGEMENT status was not saved to the database");
-           //  }
-
             sleep(2);
             return "Event consumed from Kafka";
             

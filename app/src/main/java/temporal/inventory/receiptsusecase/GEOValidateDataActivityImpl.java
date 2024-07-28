@@ -7,7 +7,7 @@ public class GEOValidateDataActivityImpl implements GEOValidateDataActivity{
     
    @Override
     public String validateEvents(){
-    sleep(2);
+    sleep(1);
      return "Event Data Validated:";
 
     }

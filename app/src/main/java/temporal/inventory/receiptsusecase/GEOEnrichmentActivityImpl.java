@@ -1,6 +1,6 @@
 
-
 package temporal.inventory.receiptsusecase;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,30 +21,28 @@ public class GEOEnrichmentActivityImpl implements GEOEnrichmentActivity {
 
         try {
             // Implement your processing logic here
-            
+
             System.out.println("GEO Enriching the record with Location and Item :");
-            sleep(5);
+            sleep(1);
             ((ObjectNode) record).put("location", "New York");
             ((ObjectNode) record).put("item", "DiorBag");
-            
+
             ObjectMapper mapper = new ObjectMapper();
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            
-            System.out.println( mapper.writeValueAsString(record));
 
-            
+            System.out.println(mapper.writeValueAsString(record));
+
         } catch (JsonProcessingException ex) {
 
-              // Log the exception
-              logger.error("Failed to process JSON: {}", ex.getMessage(), ex);
+            // Log the exception
+            logger.error("Failed to process JSON: {}", ex.getMessage(), ex);
 
-              // Provide user-friendly feedback (for example, throw a custom exception)
-              throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
+            // Provide user-friendly feedback (for example, throw a custom exception)
+            throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
         }
         return record;
     }
-   
-    
+
     private void sleep(int seconds) {
         try {
             // a random number between 800 and 1200
@@ -56,12 +54,11 @@ public class GEOEnrichmentActivityImpl implements GEOEnrichmentActivity {
             Thread.currentThread().interrupt();
         }
     }
+
     class CustomJsonProcessingException extends RuntimeException {
         public CustomJsonProcessingException(String message, Throwable cause) {
             super(message, cause);
         }
     }
-
-
 
 }
