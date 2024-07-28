@@ -48,7 +48,7 @@ public class TransferReceiptWorkflowImplTest {
         @Test
         public void givenValidArgs_itShouldExecuteWorkflow() {
                 // poor man's fixture
-                String filePath = "/Users/mnichols/dev/temporal-inventory-pipeline-receiptsusecase/TransferEvents.json";
+                String filePath = "./TransferEvents.json";
 
                 // Read the file content into a string
                 String eventData = "";
