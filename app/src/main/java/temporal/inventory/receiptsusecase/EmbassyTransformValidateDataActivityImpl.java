@@ -49,7 +49,7 @@ public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransfor
     public void rejectRecord(String eventType) {
         // Implement your processing logic here
        
-       // sleep(3);
+       sleep(1);
         System.out.println("Skipping record," +"Unsupported event type." + eventType);
         //throw new RuntimeException("Intentionally failing the workflow due to mismatched eventType.");
        Exception e = new RuntimeException(" Intentionally failing the workflow due to mismatched eventType. ");
