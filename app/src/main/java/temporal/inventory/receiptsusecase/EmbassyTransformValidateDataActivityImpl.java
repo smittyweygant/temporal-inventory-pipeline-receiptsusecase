@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.temporal.failure.ApplicationFailure;
+import org.springframework.stereotype.Component;
 
+@Component("embassy-transform-validate-data-activity")
 public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransformValidateDataActivity {
     private static final Logger logger = LoggerFactory.getLogger(EmbassyTransformValidateDataActivityImpl.class);
 
