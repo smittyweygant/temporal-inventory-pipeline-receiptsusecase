@@ -23,7 +23,7 @@ public class ActivitiesImpl implements Activities {
     public JsonNode enrichData(JsonNode record) {
 
 
-        System.out.println("GEO: Enriching the record with Location and Item ");
+        logger.info("GEO: Enriching the record with Location and Item ");
         simulateDelayRandom(1);
         ((ObjectNode) record).put("location", "New York");
         ((ObjectNode) record).put("item", "DiorBag");
@@ -36,9 +36,9 @@ public class ActivitiesImpl implements Activities {
 
     @Override
     public String processRecord(String eventType) {
-        System.out.println("Processing event type: " + eventType);
+        logger.info("Processing event type: " + eventType);
         //sleep(2);
-        System.out.println("Routing the event to Geo");
+        logger.info("Routing the event to Geo");
         return "Processing event type: " + eventType;
     }
 
@@ -67,12 +67,12 @@ public class ActivitiesImpl implements Activities {
 
         if (eventData != null && !eventData.isEmpty()) {
             // The events are not empty
-            System.out.println("Event consumed from Kafka");
+            logger.info("Event consumed from Kafka");
             return "Event consumed from Kafka";
 
         } else {
             // The string is empty or null
-            System.out.println("Event not consumed from Kafka");
+            logger.info("Event not consumed from Kafka");
             Exception e = new RuntimeException(" Intentionally failing the workflow due to no data consumed from kafka. ");
             throw ApplicationFailure.newNonRetryableFailure(e.getMessage(), e.getClass().getName());
         }
