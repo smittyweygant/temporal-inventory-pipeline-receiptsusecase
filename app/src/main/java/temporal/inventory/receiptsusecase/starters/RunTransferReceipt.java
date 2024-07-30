@@ -2,8 +2,12 @@ package temporal.inventory.receiptsusecase.starters;
 
 import java.net.URL;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
+import io.temporal.failure.ApplicationFailure;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import temporal.inventory.receiptsusecase.TransferReceiptWorkflow;
 
@@ -39,8 +43,17 @@ public class RunTransferReceipt {
             // Convert URL to Path
             Path path = Paths.get(resource.toURI());
 
-            String eventData = new String(Files.readAllBytes(path));
-            WorkflowClient.start(workflow::processEvents, eventData);
+            try {
+                String eventData = new String(Files.readAllBytes(path));
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode record = objectMapper.readTree(eventData);
+                WorkflowClient.start(workflow::processEvents, record);
+            } catch(JsonProcessingException ex){
+                // Handle JSON processing exceptions
+                System.out.println("Failed to process JSON: " + ex.getMessage());
+                // Provide user-friendly feedback or rethrow a custom exception
+                throw ApplicationFailure.newFailure("An error occurred while processing the JSON data", ex.getMessage(), ex);
+            }
 
         }
 
