@@ -31,8 +31,8 @@ public class StartMessageProcessor {
 
     System.out.println("Started Message Processor Workflow");
 
-    String filePath = "./TransferEvents.json";
-    System.out.println(filePath);
+    String filePath = "/Users/smittyweygant/Development/temporalio/demos/temporal-inventory-pipeline-receiptsusecase/TransferEvents.json";
+    // System.out.println(filePath);
     // Read the file content into a string
 
     try {
@@ -41,7 +41,7 @@ public class StartMessageProcessor {
       WorkflowClient.start(workflow::processEvents, eventData);
 
     } catch (IOException e) {
-      // Handle the exception, e.g., log it or rethrow it
+        System.out.println("Exception thrown:" + e.toString());
 
     }
     // System.out.println("TransferReceiptsWorkflow completed");

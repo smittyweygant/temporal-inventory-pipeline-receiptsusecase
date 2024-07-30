@@ -66,3 +66,58 @@ Move the CSA's and WF Duration columns so these can be seen in the console view
 Click into the message processor WF. The workflow should still be open while waiting on the child workflows to complete. 
 
 Click into one of the Transfer workflows. Review the timeline and Compact views to show the business state that the process is in. 
+
+### Receipts Pipeline in Code as a Workflow + API Delay saved by Durable Execution 
+
+````bash
+Command to start a single transfer request workflow with one message 
+````
+
+Concepts 
+Timeline view 
+- Steps represent the actual function call executions handled by Temporal (UI --> code)
+- Individual steps may execute an unreliable service, and Temporal handles this automatically
+- API delay (timeout before responding)
+- Detailed Status of specific steps (retries, what is currently pending, payload data, which help determine whether action is needed) 
+- Payload data is visible - show input and output data for the workflow. Gives a foundation for end to end testability given known inputs / outputs.  
+
+### Worker Crash
+````bash
+Command to start a single transfer request workflow with one message 
+````
+- Workflow has sleeps in it to allow us to see an issue in flight
+- Show workflow starting to make progress
+- Crash worker
+- Back to UI - workflow state is maintained, waiting for a worker to pick up next step  
+- Start worker - workflow finishes
+
+### Now lets look at troubleshooting across a number of transfer requests 
+````bash
+Command to start the message processor with a batch of messages
+````
+
+- Show the console, workflows progressing steadily
+- Visibility attributes that can be filtered
+- Event type
+- Correlation ID - ticket opened noting that something happened with a specific correlation ID
+- Bunch of workflows are all open with the same correlation ID. Let's troubleshoot
+
+### Address an issue with failing validation of message by an event type that should be working - bad event type Activity is caught by Message Processor before starting child WF. Fix is to update the external system that validates the event type
+
+- Show message processor WF with pending activities (validation failed)
+- Isolate the bug in the activity
+- Fix, redeploy, WF's continue 
+
+### Address issue rooted to a common correlation ID
+- 
+
+
+
+
+
+### Testing 
+- Test the Receipt Processor workflow - given input, validate expected output 
+- Replay production workflow in a test scenario
+
+### For WFs - decide whether to fire as async 
+

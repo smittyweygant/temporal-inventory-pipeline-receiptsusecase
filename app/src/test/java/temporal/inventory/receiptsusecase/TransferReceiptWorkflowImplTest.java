@@ -19,7 +19,7 @@ import java.util.UUID;
         classes = {
                 TransferReceiptWorkflowImplTest.Configuration.class,
         })
-// @ActiveProfiles("test")
+// @ActiveProfiles("Inventory Pipeline Tests")
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 @EnableAutoConfiguration()
 @DirtiesContext
