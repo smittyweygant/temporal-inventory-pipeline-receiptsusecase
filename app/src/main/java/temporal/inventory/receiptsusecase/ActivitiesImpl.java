@@ -3,7 +3,6 @@ package temporal.inventory.receiptsusecase;
 
 import io.temporal.activity.Activity;
 import io.temporal.activity.ActivityExecutionContext;
-import io.temporal.activity.ActivityInfo;
 import io.temporal.failure.ApplicationFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,25 +22,15 @@ public class ActivitiesImpl implements Activities {
     @Override
     public JsonNode enrichData(JsonNode record) {
 
-        try {
-            System.out.println("GEO: Enriching the record with Location and Item ");
-            simulateDelayRandom(1);
-            ((ObjectNode) record).put("location", "New York");
-            ((ObjectNode) record).put("item", "DiorBag");
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        System.out.println("GEO: Enriching the record with Location and Item ");
+        simulateDelayRandom(1);
+        ((ObjectNode) record).put("location", "New York");
+        ((ObjectNode) record).put("item", "DiorBag");
 
-            System.out.println(mapper.writeValueAsString(record));
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        } catch (JsonProcessingException ex) {
-
-            // Log the exception
-            logger.error("Failed to process JSON: {}", ex.getMessage(), ex);
-
-            // Provide user-friendly feedback (for example, throw a custom exception)
-            throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
-        }
         return record;
     }
 
@@ -55,21 +44,12 @@ public class ActivitiesImpl implements Activities {
 
 
     @Override
-    public String[] validateRecord(String eventType) {
+    public String[] filterEventType(String eventType) {
         // Workflow.sleep(Duration.ofSeconds(3));
         String[] responseType;
         switch (eventType) {
-            case "LOGICAL_MOVE_ADJUST":
-                // Change flag to suppress error
-                boolean errorFlag = false;
-
-                if (errorFlag) {
-                    throw new Error("Detected INVALID event type: LOGICAL_MOVE_ADJUST. Check data.");
-                }
-                responseType = new String[]{"TRANSFER_EVENT", "Processing transfer event type " + eventType};
-                break;
-
             // Valid response types:
+            case "LOGICAL_MOVE_ADJUST":
             case "LOGICAL_MOVE":
             case "TRANSFER_RECEIPT":
                 responseType = new String[]{"TRANSFER_EVENT", "Processing transfer event type " + eventType};
@@ -103,11 +83,11 @@ public class ActivitiesImpl implements Activities {
     public String TransformToEventModel() {
 
         boolean simulateAPIDowntime = false;
-        if(simulateAPIDowntime){
+        if (simulateAPIDowntime) {
             ActivityExecutionContext ctx = Activity.getExecutionContext();
             int activityAttempt = ctx.getInfo().getAttempt();
 
-            if(activityAttempt < 4){
+            if (activityAttempt < 4) {
                 simulateDelayRandom(4);
                 throw new RuntimeException("API call timed out after 5 seconds. Retry attempt: " + activityAttempt);
             } else {
@@ -122,8 +102,18 @@ public class ActivitiesImpl implements Activities {
     }
 
     @Override
-    public String validateEvents() {
+    public String validateEvents(JsonNode eventData) {
         simulateDelayRandom(1);
+
+        String correlationId = eventData.path("header").path("correlationId").asText();
+        // System.out.println("VALIDATING event data for correlationId: " + correlationId);
+
+        boolean simulateBadDataBug = false;
+        if (simulateBadDataBug && correlationId.equals("P0000000002018374594")) {
+            // simulate API failure
+            throw new RuntimeException("Invalid data found for event. Failing validation.");
+        }
+
         return "GEO: Event Data Validated";
 
     }
