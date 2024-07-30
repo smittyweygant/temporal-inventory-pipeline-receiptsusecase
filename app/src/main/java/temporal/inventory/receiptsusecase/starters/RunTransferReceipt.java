@@ -47,7 +47,7 @@ public class RunTransferReceipt {
                 String eventData = new String(Files.readAllBytes(path));
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode record = objectMapper.readTree(eventData);
-                WorkflowClient.start(workflow::processEvents, record);
+                WorkflowClient.start(workflow::processEvent, record);
             } catch(JsonProcessingException ex){
                 // Handle JSON processing exceptions
                 System.out.println("Failed to process JSON: " + ex.getMessage());

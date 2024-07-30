@@ -41,7 +41,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
             Activities.class, options);
 
     @Override
-    public String processEvents(JsonNode record) {
+    public String processEvent(JsonNode event) {
 
         System.out.println("Processing Receipt Event");
 
@@ -49,32 +49,32 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
         activities.saveStatus(status);
         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-        // Parse and process transfer record
-        String eventType = record.path("header").path("eventType").asText();
-        String correlationId = record.path("header").path("correlationId").asText();
+        // Parse and process transfer event
+        String eventType = event.path("header").path("eventType").asText();
+        String correlationId = event.path("header").path("correlationId").asText();
         Workflow.upsertTypedSearchAttributes(CORRELATION_ID.valueSet(correlationId));
 
         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_TYPE.valueSet(eventType));
 
         status = "ENRICHMENT";
-        activities.enrichData(record);
-        activities.saveStatus(status);
         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
+        activities.enrichData(event);
+        activities.saveStatus(status);
 
         status = "VALIDATION";
-        activities.validateEvents();
-        activities.saveStatus(status);
         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
+        activities.validateEvents(event);
+        activities.saveStatus(status);
 
         status = "TRANSFORMATION";
+        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
         activities.TransformToEventModel();
         activities.saveStatus(status);
-        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
         status = "PUBLISHED";
+        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
         activities.publishEvents();
         activities.saveStatus(status);
-        Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
         return status;
     }

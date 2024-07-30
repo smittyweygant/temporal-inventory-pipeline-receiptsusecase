@@ -4,21 +4,22 @@ package temporal.inventory.receiptsusecase;
 import java.time.Duration;
 import java.util.Iterator;
 
-import io.temporal.failure.ApplicationFailure;
+import io.temporal.workflow.Async;
+import io.temporal.workflow.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.temporal.activity.ActivityOptions;
 import io.temporal.api.enums.v1.ParentClosePolicy;
 import io.temporal.common.RetryOptions;
 import io.temporal.common.SearchAttributeKey;
-import io.temporal.workflow.Async;
 import io.temporal.workflow.ChildWorkflowOptions;
 import io.temporal.workflow.Workflow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
 
@@ -43,30 +44,30 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
             Activities.class, options);
 
     @Override
-    public void processEventsBatch(JsonNode rootNode) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void processEventsBatch(JsonNode events) {
 
-
-        activities.ackEvents(rootNode);
+        activities.ackEvents(events);
         String status = "ACKNOWLEDGEMENT";
         activities.saveStatus(status);
 
-        if (rootNode.isArray()) {
+        if (events.isArray()) {
 
             // Iterate through batch of messages
             // Validate each message by type
             // Route valid messages to a child workflow
             // Invalid messages are either retried or ignored depending on type
 
-            Iterator<JsonNode> records = rootNode.elements();
-            while (records.hasNext()) {
-                JsonNode record = records.next();
-                String eventType = record.path("header").path("eventType").asText();
-                String requestId = record.path("header").path("id").asText();
-                String correlationId = record.path("header").path("correlationId").asText();
+            Iterator<JsonNode> eventIterator = events.elements();
+            List<Promise<String>> promises = new ArrayList<>();
 
-                // Validate the Event Type
-                String[] response = activities.validateRecord(eventType);
+            while (eventIterator.hasNext()) {
+                JsonNode event = eventIterator.next();
+                String eventType = event.path("header").path("eventType").asText();
+                String requestId = event.path("header").path("id").asText();
+                String correlationId = event.path("header").path("correlationId").asText();
+
+                // Filter the Event Type
+                String[] response = activities.filterEventType(eventType);
                 String responseCode = response[0];
 
                 // If event type is valid, start a child workflow
@@ -77,12 +78,20 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                                     .setWorkflowId("Transfer-Receipt-" + requestId)
                                     .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
                                     .build();
-                    TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(TransferReceiptWorkflow.class, childWorkflowOptions);
-                    System.out.println("Start Child Workflow to process Receipt Event");
-                    receiptChildWorkflow.processEvents(record);
-                }
 
+                    TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(
+                            TransferReceiptWorkflow.class, childWorkflowOptions);
+
+                    // Start the child workflow asynchronously
+                    Promise<String> receiptChildWorkflowPromise = Async.function(receiptChildWorkflow::processEvent, event);
+                    promises.add(receiptChildWorkflowPromise);
+
+                    System.out.println("Started Child Workflow to process transfer receipt");
+                }
             }
+
+            // Wait for all child workflows to complete
+            Promise.allOf(promises).get();
 
         } else {
             System.out.println("Input JSON is not an array. Ending workflow.");

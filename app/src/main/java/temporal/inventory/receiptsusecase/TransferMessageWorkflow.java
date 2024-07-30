@@ -8,6 +8,6 @@ import io.temporal.workflow.WorkflowMethod;
 @WorkflowInterface
 public interface TransferMessageWorkflow {
   @WorkflowMethod
-  void processEventsBatch(JsonNode eventData);
+  void processEventsBatch(JsonNode events);
 
 }
