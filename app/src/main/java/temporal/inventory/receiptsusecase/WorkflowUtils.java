@@ -6,7 +6,7 @@ public class WorkflowUtils {
     // Utility method to check if a string is not empty
     public static String saveStatustoDB(String status) {
         isAcknowledgementSaved = true;
-        return "Event Status saved to EventDB :" + status;
+        return "Event Status saved to EventDb: " + status;
 
     }
     // Add other utility methods as needed

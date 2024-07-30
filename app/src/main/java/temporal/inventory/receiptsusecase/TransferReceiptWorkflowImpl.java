@@ -2,8 +2,8 @@
 package temporal.inventory.receiptsusecase;
 
 import java.time.Duration;
-import java.util.Iterator;
 
+import io.temporal.failure.ApplicationFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,35 +28,17 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
 
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(30))
+                .setStartToCloseTimeout(Duration.ofSeconds(5))
                 .setRetryOptions(RetryOptions.newBuilder()
-                        .setMaximumAttempts(10)
+                        .setInitialInterval(Duration.ofSeconds(3))
+                        .setMaximumInterval(Duration.ofSeconds(15))
                         .setDoNotRetry(IllegalArgumentException.class.getName())
                         .build())
                 .build();
-        
+
         // Activity stubs
-
-        private final EmbassyTransformValidateDataActivity tvactivities = Workflow.newActivityStub(
-                EmbassyTransformValidateDataActivity.class, options);
-
-        private final GEOValidateDataActivity evalactivities = Workflow.newActivityStub(
-                        GEOValidateDataActivity.class, options);
-
-        private final GEOTransformModelActivity geotransformactivities = Workflow.newActivityStub(
-                        GEOTransformModelActivity.class, options);
-
-        private final SaveStatusActivity ssactivities = Workflow.newActivityStub(
-                        SaveStatusActivity.class, options);
-                        
-        private final GEOEnrichmentActivity enrichactivities = Workflow.newActivityStub(
-                        GEOEnrichmentActivity.class, options);
-
-        private final PublishActivity publishactivities = Workflow.newActivityStub(
-                        PublishActivity.class, options);
-                        
-        private final EmbassyAcknowledgeDataActivity ackactivities = Workflow.newActivityStub(
-                        EmbassyAcknowledgeDataActivity.class, options);
+        private final Activities activities = Workflow.newActivityStub(
+                Activities.class, options);
 
         @Override
         public void processEvents(String eventData) {
@@ -64,10 +46,10 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
 
                 try {
                         System.out.println("Processing Receipt Event - Child WF");
-                        System.out.println("Input String:" + eventData);
+                        System.out.println("Input String: "+ eventData);
 
                         String status = "ACKNOWLEDGEMENT";
-                        ssactivities.savestatus(status);
+                        activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
                         
                         // Parse and process transfer record
@@ -79,39 +61,31 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_TYPE.valueSet(eventType));
 
                         status = "ENRICHMENT";
-                        enrichactivities.enrichData(record);
-                        ssactivities.savestatus(status);
+                        activities.enrichData(record);
+                        activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
                         status = "VALIDATION";
-                        evalactivities.validateEvents();
-                        ssactivities.savestatus(status);
+                        activities.validateEvents();
+                        activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                        status = "TRANFORMATION";
-                        geotransformactivities.tranformtoeventmodel();
-                        ssactivities.savestatus(status);
+                        status = "TRANSFORMATION";
+                        activities.TransformToEventModel();
+                        activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
                         status = "PUBLISHED";
-                        publishactivities.publishEvents();
-                        ssactivities.savestatus(status);
+                        activities.publishEvents();
+                        activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
                 } catch (JsonProcessingException ex) {
                         // Handle JSON processing exceptions
                         log.error("Failed to process JSON: {}", ex.getMessage(), ex);
                         // Provide user-friendly feedback or rethrow a custom exception
-                        throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
-                } // catch (RuntimeException ex) {
-                  // Handle other runtime exceptions
-                  // log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
-                  // }
-        }
-
-        class CustomJsonProcessingException extends RuntimeException {
-                public CustomJsonProcessingException(String message, Throwable cause) {
-                        super(message, cause);
+                        throw ApplicationFailure.newFailure("An error occurred while processing the JSON data", ex.getMessage(), ex);
                 }
         }
+
 }
