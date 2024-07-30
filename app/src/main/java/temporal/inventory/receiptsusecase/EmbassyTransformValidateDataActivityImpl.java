@@ -25,9 +25,8 @@ public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransfor
         String responseType = "UNDETERMINED";
         switch (eventType) {
             case "LOGICAL_MOVE_ADJUST":
-                // Change flag to suppress error
+                // Change flag to trigger or suppress error
                 boolean errorFlag = false;
-
                 if (errorFlag) {
                     throw new Error("LOGICAL_MOVE_ADJUST is not a valid event type. Check data.");
                 }
