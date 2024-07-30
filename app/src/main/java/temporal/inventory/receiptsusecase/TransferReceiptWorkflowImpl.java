@@ -77,7 +77,6 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         Workflow.upsertTypedSearchAttributes(CORRELATION_ID.valueSet(correlationId));
 
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_TYPE.valueSet(eventType));
-                        tvactivities.processRecord(eventType);
 
                         status = "ENRICHMENT";
                         enrichactivities.enrichData(record);
@@ -99,49 +98,6 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         ssactivities.savestatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                        
-
-                        // if (rootNode.isArray()) {
-                        //         Iterator<JsonNode> records = rootNode.elements();
-                        //         while (records.hasNext()) {
-                        //                 JsonNode record = records.next();
-                        //                 String eventType = record.path("header").path("eventType").asText();
-
-                        //                 if ("LOGICAL_MOVE".equals(eventType) ||
-                        //                                 "LOGICAL_MOVE_ADJUST".equals(eventType) ||
-                        //                                 "TRANSFER_RECEIPT".equals(eventType)) {
-                        //                         // Workflow.sleep(Duration.ofSeconds(30));
-
-                        //                         // Transfer Receipt Pipeline Workflow logic
-
-                        //                         tvactivities.processRecord(eventType);
-
-                        //                         enrichactivities.enrichData(record);
-
-                        //                         String statusenriched = "ENRICHMENT";
-
-                        //                         ssactivities.savestatus(statusenriched);
-
-                        //                         String statusvalidation = "VALIDATION";
-                        //                         evalactivities.validateEvents();
-                        //                         ssactivities.savestatus(statusvalidation);
-
-                        //                         String statustranformationgeo = "TRANFORMATION";
-                        //                         geotransformactivities.tranformtoeventmodel();
-                        //                         ssactivities.savestatus(statustranformationgeo);
-
-                        //                         String statuspublish = "PUBLISHED";
-                        //                         publishactivities.publishEvents();
-                        //                         ssactivities.savestatus(statuspublish);
-
-                        //                 } else {
-                        //                         Async.procedure(() -> tvactivities.rejectRecord(eventType));
-                        //                         // tvactivities.rejectRecord(eventType);
-                        //                 }
-                        //         }
-                        // } else {
-                        //         System.out.println("Input JSON is not an array. Ending workflow.");
-                        // }
                 } catch (JsonProcessingException ex) {
                         // Handle JSON processing exceptions
                         log.error("Failed to process JSON: {}", ex.getMessage(), ex);
@@ -150,9 +106,6 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                 } // catch (RuntimeException ex) {
                   // Handle other runtime exceptions
                   // log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
-                  // Provide user-friendly feedback or rethrow a custom exception
-                  // throw new CustomJsonProcessingException("A runtime error occurred while
-                  // processing the event data", ex);
                   // }
         }
 

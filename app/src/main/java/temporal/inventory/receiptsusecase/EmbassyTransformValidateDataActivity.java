@@ -8,6 +8,7 @@ import io.temporal.activity.ActivityMethod;
 public interface EmbassyTransformValidateDataActivity {
     @ActivityMethod
     String processRecord(String eventType);
-    void rejectRecord(String eventType);
+    @ActivityMethod
+    String validateRecord(String eventType);
 }
   

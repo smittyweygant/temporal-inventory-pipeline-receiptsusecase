@@ -19,14 +19,14 @@
 
 package temporal.inventory.receiptsusecase.dataclasses;
 
-public enum EventTypes {
+public enum EventType {
   TRANSFER("Transfer"),
   SPECIAL_REQUEST("Special Request"),
   ADJUSTMENT("Adjustment");
 
   private final String action;
 
-  EventTypes(String action) {
+  EventType(String action) {
       this.action = action;
   }
 

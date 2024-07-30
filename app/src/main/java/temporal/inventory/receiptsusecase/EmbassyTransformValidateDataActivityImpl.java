@@ -12,57 +12,40 @@ public class EmbassyTransformValidateDataActivityImpl implements EmbassyTransfor
 
     @Override
     public String processRecord(String eventType) {
-        // Implement your processing logic here
-       //try {
         System.out.println("Processing event type: " + eventType);
         //sleep(2);
         System.out.println("Routing the event to the GEO");
-
-      //logger.info("\n\nSimulating Processing activity failure.\n\n");
-      // throw new RuntimeException("Error causing the processing mismatched record");
-    
-
-
        return "Processing event type: " + eventType;
     }
-       //} catch (Exception e) {
 
-
-        //logger.info("\n\nSimulating Processing activity failure.\n\n");
-        // throw new RuntimeException("Error causing the processing mismatched record");
-    
-        
-
-        // Simulate processing failure
-      // logger.info("\n\nSimulating Processing activity failure.\n\n");
-      // throw new RuntimeException("Error causing the processing API go down!");
-           // Exception e = new RuntimeException("Processing the event failed");
-           //throw ApplicationFailure.newNonRetryableFailure(e.getMessage(), e.getClass().getName());
            
-         //  logger.info("\n\nSimulating Processing activity failure.\n\n");
-          // throw new RuntimeException("Error causing the processing mismacthed record");
-           
-          
-
-
-
-    
     @Override
-    public void rejectRecord(String eventType) {
-        // Implement your processing logic here
-       
-       sleep(1);
-        System.out.println("Skipping record," +"Unsupported event type." + eventType);
-        //throw new RuntimeException("Intentionally failing the workflow due to mismatched eventType.");
-       Exception e = new RuntimeException(" Intentionally failing the workflow due to mismatched eventType. ");
-       throw ApplicationFailure.newNonRetryableFailure(e.getMessage(), e.getClass().getName());
+    public String validateRecord(String eventType) {
+        // Workflow.sleep(Duration.ofSeconds(3));
+        String responseType = "UNDETERMINED";
+        switch (eventType) {
+            case "LOGICAL_MOVE_ADJUST":
+                // Change flag to suppress error
+                boolean errorFlag = false;
 
-      // logger.info("\n\nSimulating Processing activity failure.\n\n");
-      //throw new RuntimeException("Error causing the processing mismacthed record");
+                if (errorFlag) {
+                    throw new Error("LOGICAL_MOVE_ADJUST is not a valid event type. Check data.");
+                }
+                responseType = "TRANSFER_EVENT";
+                break;
 
+            // Valid response types: 
+            case "LOGICAL_MOVE":
+            case "TRANSFER_RECEIPT":
+            responseType = "TRANSFER_EVENT";
+                break;
+            default:
+                responseType = "NON_TRANSFER";
+                break;
+        }
+        return responseType;
     }
-
-
+            
 
     private void sleep(int seconds) {
         try {

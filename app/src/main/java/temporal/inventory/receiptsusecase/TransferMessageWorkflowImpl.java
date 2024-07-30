@@ -60,6 +60,12 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                         JsonNode rootNode = objectMapper.readTree(eventData);
 
                         if (rootNode.isArray()) {
+
+                                // Iterate through batch of messages
+                                //  Validate each message by type
+                                // Route valid messages to a child workflow 
+                                // Invalid messages are either retried or ignored depending on type
+
                                 Iterator<JsonNode> records = rootNode.elements();
                                 while (records.hasNext()) {
                                         JsonNode record = records.next();
@@ -67,27 +73,26 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                                         String requestId = record.path("header").path("id").asText();
                                         String correlationId = record.path("header").path("correlationId").asText();
 
-                                        if ("LOGICAL_MOVE".equals(eventType) ||
-                                                        "LOGICAL_MOVE_ADJUST".equals(eventType) ||
-                                                        "TRANSFER_RECEIPT".equals(eventType)) {
-                                                // Workflow.sleep(Duration.ofSeconds(30));
-
-                                                // Start a child workflow to process transfer event activities
+                                        // Validate the Event Type
+                                        // Async.procedure(() -> tvactivities.validateRecord(eventType));
+                                        String response = tvactivities.validateRecord(eventType);
+                                        
+                                        // If event type is valid, start a child workflow 
+                                        // to process transfer event activities
+                                        if ("TRANSFER_EVENT".equals(response)) {
                                                 ChildWorkflowOptions childWorkflowOptions =
                                                         ChildWorkflowOptions.newBuilder()
                                                         .setWorkflowId("Transfer-Receipt-" + requestId)
                                                         .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
                                                         .build();
                                                 TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(TransferReceiptWorkflow.class, childWorkflowOptions);
-                                                
-                                                System.out.println("Processing Receipt Event");
+                                                System.out.println("Start Child Workflow to process Receipt Event");
                                                 receiptChildWorkflow.processEvents(record.toString());
-
-                                        } else {
-                                                Async.procedure(() -> tvactivities.rejectRecord(eventType));
-                                                // tvactivities.rejectRecord(eventType);
                                         }
+                                        
+                                        
                                 }
+
                         } else {
                                 System.out.println("Input JSON is not an array. Ending workflow.");
                         }
