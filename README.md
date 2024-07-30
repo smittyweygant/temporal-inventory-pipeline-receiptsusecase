@@ -38,6 +38,13 @@ Temporal Workflow that orchestrates the underlying APIs, ultimately flushing to 
 Replaced with (internal) doc here: [Transfer Receipts Flow](https://docs.google.com/document/d/1YJLXcIXxcKir8bsI4csDj9kk0dS9Fut04Ik2x21lVEk/edit)
 
 ### Testing (TODO) 
+Run an end-to-end TransferReceipt workflow test using
+
+```bash
+./gradlew test --info --tests "temporal.inventory.receiptsusecase.TransferWorkflowTest" 
+```
+
+
 - Test the Receipt Processor workflow - given input, validate expected output 
 - Replay production workflow in a test scenario
 
