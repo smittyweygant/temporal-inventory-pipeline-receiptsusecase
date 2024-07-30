@@ -1,6 +1,9 @@
 
 package temporal.inventory.receiptsusecase;
 
+import io.temporal.activity.Activity;
+import io.temporal.activity.ActivityExecutionContext;
+import io.temporal.activity.ActivityInfo;
 import io.temporal.failure.ApplicationFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +83,7 @@ public class ActivitiesImpl implements Activities {
     }
 
     @Override
-    public String ackEvents(String eventData) {
+    public String ackEvents(JsonNode eventData) {
 
         if (eventData != null && !eventData.isEmpty()) {
             // The events are not empty
@@ -98,6 +101,21 @@ public class ActivitiesImpl implements Activities {
 
     @Override
     public String TransformToEventModel() {
+
+        boolean simulateAPIDowntime = false;
+        if(simulateAPIDowntime){
+            ActivityExecutionContext ctx = Activity.getExecutionContext();
+            int activityAttempt = ctx.getInfo().getAttempt();
+
+            if(activityAttempt < 4){
+                simulateDelayRandom(4);
+                throw new RuntimeException("API call timed out after 5 seconds. Retry attempt: " + activityAttempt);
+            } else {
+                logger.info("API recovered");
+            }
+
+        }
+
         simulateDelayRandom(1);
         return "GEO: Inventory DataModel transformed to Event Model";
 
@@ -112,12 +130,6 @@ public class ActivitiesImpl implements Activities {
 
     @Override
     public String saveStatus(String status) {
-
-        boolean isstatusSaved = true;
-
-        if (!isstatusSaved) {
-            throw new RuntimeException(status + "status was not saved to the database");
-        }
 
         return "Event Status saved to EventDb: " + status;
 

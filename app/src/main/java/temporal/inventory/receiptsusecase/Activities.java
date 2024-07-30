@@ -17,7 +17,7 @@ public interface Activities {
     String[] validateRecord(String eventType);
 
     @ActivityMethod
-    String ackEvents(String eventData);
+    String ackEvents(JsonNode eventData);
 
     @ActivityMethod
     String TransformToEventModel();
