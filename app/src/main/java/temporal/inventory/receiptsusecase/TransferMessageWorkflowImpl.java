@@ -4,6 +4,7 @@ package temporal.inventory.receiptsusecase;
 import java.time.Duration;
 import java.util.Iterator;
 
+import io.temporal.failure.ApplicationFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,40 +30,32 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
         
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(30))
+                .setStartToCloseTimeout(Duration.ofSeconds(10))
                 .setRetryOptions(RetryOptions.newBuilder()
-                        .setMaximumAttempts(10)
+                        .setMaximumInterval(Duration.ofSeconds(15))
                         .setDoNotRetry(IllegalArgumentException.class.getName())
                         .build())
                 .build();
         
-        
         // Activity stubs
-
-        private final EmbassyAcknowledgeDataActivity ackactivities = Workflow.newActivityStub(
-                        EmbassyAcknowledgeDataActivity.class, options);
-
-        private final EmbassyTransformValidateDataActivity tvactivities = Workflow.newActivityStub(
-                EmbassyTransformValidateDataActivity.class, options);
-
-        private final SaveStatusActivity ssactivities = Workflow.newActivityStub(
-                SaveStatusActivity.class, options);
+        private final Activities activities = Workflow.newActivityStub(
+                        Activities.class, options);
 
         @Override
         public void processEvents(String eventData) {
                 ObjectMapper objectMapper = new ObjectMapper();
 
                 try {
-                        ackactivities.ackEvents(eventData);
+                        activities.ackEvents(eventData);
                         String status = "ACKNOWLEDGEMENT";
-                        ssactivities.savestatus(status);
+                        activities.saveStatus(status);
 
                         JsonNode rootNode = objectMapper.readTree(eventData);
 
                         if (rootNode.isArray()) {
 
                                 // Iterate through batch of messages
-                                //  Validate each message by type
+                                // Validate each message by type
                                 // Route valid messages to a child workflow 
                                 // Invalid messages are either retried or ignored depending on type
 
@@ -74,8 +67,7 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                                         String correlationId = record.path("header").path("correlationId").asText();
 
                                         // Validate the Event Type
-                                        // Async.procedure(() -> tvactivities.validateRecord(eventType));
-                                        String response = tvactivities.validateRecord(eventType);
+                                        String response = activities.validateRecord(eventType);
                                         
                                         // If event type is valid, start a child workflow 
                                         // to process transfer event activities
@@ -100,7 +92,7 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                         // Handle JSON processing exceptions
                         log.error("Failed to process JSON: {}", ex.getMessage(), ex);
                         // Provide user-friendly feedback or rethrow a custom exception
-                        throw new CustomJsonProcessingException("An error occurred while processing the JSON data", ex);
+                        throw ApplicationFailure.newFailure("An error occurred while processing the JSON data", ex.getMessage(), ex);
                 } 
                 // Handle other runtime exceptions
                 catch (RuntimeException ex) {
@@ -108,9 +100,4 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                 }
         }
 
-        class CustomJsonProcessingException extends RuntimeException {
-                public CustomJsonProcessingException(String message, Throwable cause) {
-                        super(message, cause);
-                }
-        }
 }
