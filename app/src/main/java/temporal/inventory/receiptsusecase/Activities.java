@@ -14,7 +14,7 @@ public interface Activities {
     String processRecord(String eventType);
 
     @ActivityMethod
-    String validateRecord(String eventType);
+    String[] validateRecord(String eventType);
 
     @ActivityMethod
     String ackEvents(String eventData);
@@ -31,4 +31,3 @@ public interface Activities {
     @ActivityMethod
     String saveStatus(String status);
 }
- 

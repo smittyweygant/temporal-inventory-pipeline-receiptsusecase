@@ -1,6 +1,5 @@
-package temporal.inventory.receiptsusecase;
+package temporal.inventory.receiptsusecase.starters;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,8 +8,9 @@ import java.nio.file.Paths;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import io.temporal.serviceclient.WorkflowServiceStubs;
+import temporal.inventory.receiptsusecase.TransferMessageWorkflow;
 
-public class StartMessageProcessor {
+public class RunTransferReceiptBatch {
     @SuppressWarnings("CatchAndPrintStackTrace")
     public static void main(String[] args) throws Exception {
 
@@ -22,9 +22,12 @@ public class StartMessageProcessor {
         // Workflows.
         WorkflowClient client = WorkflowClient.newInstance(service);
 
+        // Current time in milliseconds
+        long currentTime = System.currentTimeMillis();
+
         // Define the workflow unique id
         WorkflowOptions options = WorkflowOptions.newBuilder()
-                .setWorkflowId("TransferMessage")
+                .setWorkflowId("TransferMessageBatch-" + currentTime)
                 .setTaskQueue("TRANSFER_RECEIPTS_TASK_QUEUE")
                 .build();
 
@@ -38,22 +41,17 @@ public class StartMessageProcessor {
         // System.out.println(filePath);
         // Read the file content into a string
 
-        try {
-            URL resource = Starter.class.getClassLoader().getResource("TransferEvents.json");
-            if (resource == null) {
-                throw new IllegalArgumentException("file not found! " + "TransferEvents.json");
-            } else {
-                // Convert URL to Path
-                Path path = Paths.get(resource.toURI());
+        URL resource = RunTransferReceipt.class.getClassLoader().getResource("TransferEvents.json");
+        if (resource == null) {
+            throw new IllegalArgumentException("file not found! " + "TransferEvents.json");
+        } else {
+            // Convert URL to Path
+            Path path = Paths.get(resource.toURI());
 
-                String eventData = new String(Files.readAllBytes(path));
-                WorkflowClient.start(workflow::processEvents, eventData);
-            }
-
-        } catch (IOException e) {
-            System.out.println("Exception thrown:" + e.toString());
-
+            String eventData = new String(Files.readAllBytes(path));
+            WorkflowClient.start(workflow::processEvents, eventData);
         }
+
         // System.out.println("TransferReceiptsWorkflow completed");
         System.exit(0);
         // return null;

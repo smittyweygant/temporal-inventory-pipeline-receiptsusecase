@@ -30,8 +30,9 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
         
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(10))
+                .setStartToCloseTimeout(Duration.ofSeconds(5))
                 .setRetryOptions(RetryOptions.newBuilder()
+                        .setInitialInterval(Duration.ofSeconds(3))
                         .setMaximumInterval(Duration.ofSeconds(15))
                         .setDoNotRetry(IllegalArgumentException.class.getName())
                         .build())
@@ -67,11 +68,12 @@ public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
                                         String correlationId = record.path("header").path("correlationId").asText();
 
                                         // Validate the Event Type
-                                        String response = activities.validateRecord(eventType);
+                                        String[] response = activities.validateRecord(eventType);
+                                        String responseCode = response[0];
                                         
                                         // If event type is valid, start a child workflow 
                                         // to process transfer event activities
-                                        if ("TRANSFER_EVENT".equals(response)) {
+                                        if ("TRANSFER_EVENT".equals(responseCode)) {
                                                 ChildWorkflowOptions childWorkflowOptions =
                                                         ChildWorkflowOptions.newBuilder()
                                                         .setWorkflowId("Transfer-Receipt-" + requestId)

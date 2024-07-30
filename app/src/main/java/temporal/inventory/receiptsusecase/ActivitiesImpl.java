@@ -21,10 +21,8 @@ public class ActivitiesImpl implements Activities {
     public JsonNode enrichData(JsonNode record) {
 
         try {
-            // Implement your processing logic here
-
-            System.out.println("GEO: Enriching the record with Location and Item :");
-            sleep(1);
+            System.out.println("GEO: Enriching the record with Location and Item ");
+            simulateDelayRandom(1);
             ((ObjectNode) record).put("location", "New York");
             ((ObjectNode) record).put("item", "DiorBag");
 
@@ -54,27 +52,28 @@ public class ActivitiesImpl implements Activities {
 
 
     @Override
-    public String validateRecord(String eventType) {
+    public String[] validateRecord(String eventType) {
         // Workflow.sleep(Duration.ofSeconds(3));
-        String responseType = "UNDETERMINED";
+        String[] responseType;
         switch (eventType) {
             case "LOGICAL_MOVE_ADJUST":
                 // Change flag to suppress error
                 boolean errorFlag = false;
 
                 if (errorFlag) {
-                    throw new Error("LOGICAL_MOVE_ADJUST is not a valid event type. Check data.");
+                    throw new Error("Detected INVALID event type: LOGICAL_MOVE_ADJUST. Check data.");
                 }
-                responseType = "TRANSFER_EVENT";
+                responseType = new String[]{"TRANSFER_EVENT", "Processing transfer event type " + eventType};
                 break;
 
             // Valid response types:
             case "LOGICAL_MOVE":
             case "TRANSFER_RECEIPT":
-                responseType = "TRANSFER_EVENT";
+                responseType = new String[]{"TRANSFER_EVENT", "Processing transfer event type " + eventType};
                 break;
             default:
-                responseType = "NON_TRANSFER";
+                responseType = new String[]{"NON_TRANSFER", "Filtered out known non-transfer event type " + eventType +
+                        " from processing."};
                 break;
         }
         return responseType;
@@ -86,7 +85,6 @@ public class ActivitiesImpl implements Activities {
         if (eventData != null && !eventData.isEmpty()) {
             // The events are not empty
             System.out.println("Event consumed from Kafka");
-            sleep(2);
             return "Event consumed from Kafka";
 
         } else {
@@ -100,44 +98,42 @@ public class ActivitiesImpl implements Activities {
 
     @Override
     public String TransformToEventModel() {
-
-        return "Geo: Inventory DataModel transformed to Event Model:";
+        simulateDelayRandom(1);
+        return "GEO: Inventory DataModel transformed to Event Model";
 
     }
 
     @Override
     public String validateEvents() {
-        sleep(1);
-        return "Geo: Event Data Validated:";
+        simulateDelayRandom(1);
+        return "GEO: Event Data Validated";
 
     }
 
     @Override
-    public String saveStatus(String status){
+    public String saveStatus(String status) {
 
-        boolean isstatusSaved  = true;
+        boolean isstatusSaved = true;
 
-        if (!isstatusSaved)
-        {
-            throw new RuntimeException(status +"status was not saved to the database");
+        if (!isstatusSaved) {
+            throw new RuntimeException(status + "status was not saved to the database");
         }
 
-        return "Event Status saved to EventDB :" + status;
+        return "Event Status saved to EventDb: " + status;
 
     }
 
     @Override
-    public String publishEvents(){
-
-        return "TRANSFER RECEIPTS Event Data Published:";
+    public String publishEvents() {
+        simulateDelayRandom(1);
+        return "Transfer Receipt data written to database";
 
     }
 
-    private void sleep(int seconds) {
+    private void simulateDelayRandom(int seconds) {
         try {
-            // a random number between 800 and 1200
             // to simulate variance in API call time
-            long sleepTime = (long) (Math.random() * 400) + 800;
+            long sleepTime = (long) (Math.random() * 600) + 800;
 
             Thread.sleep(seconds * sleepTime);
         } catch (InterruptedException e) {

@@ -28,9 +28,10 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
 
         // activity retry policy
         private final ActivityOptions options = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(30))
+                .setStartToCloseTimeout(Duration.ofSeconds(5))
                 .setRetryOptions(RetryOptions.newBuilder()
-                        .setMaximumAttempts(10)
+                        .setInitialInterval(Duration.ofSeconds(3))
+                        .setMaximumInterval(Duration.ofSeconds(15))
                         .setDoNotRetry(IllegalArgumentException.class.getName())
                         .build())
                 .build();
@@ -45,7 +46,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
 
                 try {
                         System.out.println("Processing Receipt Event - Child WF");
-                        System.out.println("Input String:" + eventData);
+                        System.out.println("Input String: "+ eventData);
 
                         String status = "ACKNOWLEDGEMENT";
                         activities.saveStatus(status);
@@ -69,7 +70,7 @@ public class TransferReceiptWorkflowImpl implements TransferReceiptWorkflow {
                         activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
 
-                        status = "TRANFORMATION";
+                        status = "TRANSFORMATION";
                         activities.TransformToEventModel();
                         activities.saveStatus(status);
                         Workflow.upsertTypedSearchAttributes(TRANSFER_EVENT_STATUS.valueSet(status));
