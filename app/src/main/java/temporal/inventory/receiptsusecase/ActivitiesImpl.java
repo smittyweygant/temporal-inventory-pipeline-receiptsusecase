@@ -106,7 +106,6 @@ public class ActivitiesImpl implements Activities {
         simulateDelayRandom(1);
 
         String correlationId = eventData.path("header").path("correlationId").asText();
-        // System.out.println("VALIDATING event data for correlationId: " + correlationId);
 
         boolean simulateBadDataBug = false;
         if (simulateBadDataBug && correlationId.equals("P0000000002018374594")) {
