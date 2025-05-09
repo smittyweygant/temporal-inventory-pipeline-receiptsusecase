@@ -1,16 +1,14 @@
-
 package temporal.inventory.receiptsusecase;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import io.temporal.failure.ApplicationFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.temporal.activity.ActivityOptions;
 import io.temporal.api.enums.v1.ParentClosePolicy;
@@ -18,88 +16,64 @@ import io.temporal.common.RetryOptions;
 import io.temporal.common.SearchAttributeKey;
 import io.temporal.workflow.Async;
 import io.temporal.workflow.ChildWorkflowOptions;
+import io.temporal.workflow.Promise;
 import io.temporal.workflow.Workflow;
 
 public class TransferMessageWorkflowImpl implements TransferMessageWorkflow {
-        
-        // set up logger
-        private static final Logger log = LoggerFactory.getLogger(TransferMessageWorkflowImpl.class);
-  
-        // transfer state stored in a local object and status pushed to Temporal Advanced Visibility
-        static final SearchAttributeKey<String> TRANSFER_EVENT_STATUS = SearchAttributeKey.forKeyword("TRANSFER_EVENT_STATUS");
-        
-        // activity retry policy
-        private final ActivityOptions options = ActivityOptions.newBuilder()
-                .setStartToCloseTimeout(Duration.ofSeconds(5))
-                .setRetryOptions(RetryOptions.newBuilder()
-                        .setInitialInterval(Duration.ofSeconds(3))
-                        .setMaximumInterval(Duration.ofSeconds(15))
-                        .setDoNotRetry(IllegalArgumentException.class.getName())
-                        .build())
-                .build();
-        
-        // Activity stubs
-        private final Activities activities = Workflow.newActivityStub(
-                        Activities.class, options);
+    private static final Logger log = LoggerFactory.getLogger(TransferMessageWorkflowImpl.class);
 
-        @Override
-        public void processEvents(String eventData) {
-                ObjectMapper objectMapper = new ObjectMapper();
+    private static final SearchAttributeKey<String> TRANSFER_EVENT_STATUS = SearchAttributeKey.forKeyword("TRANSFER_EVENT_STATUS");
 
-                try {
-                        activities.ackEvents(eventData);
-                        String status = "ACKNOWLEDGEMENT";
-                        activities.saveStatus(status);
+    private static final ActivityOptions ACTIVITY_OPTIONS = ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofSeconds(5))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setInitialInterval(Duration.ofSeconds(3))
+                    .setMaximumInterval(Duration.ofSeconds(15))
+                    .setDoNotRetry(IllegalArgumentException.class.getName())
+                    .build())
+            .build();
 
-                        JsonNode rootNode = objectMapper.readTree(eventData);
+    private final Activities activities = Workflow.newActivityStub(Activities.class, ACTIVITY_OPTIONS);
 
-                        if (rootNode.isArray()) {
+    @Override
+    public void processEventsBatch(JsonNode events) {
+        log.info("Acknowledging events");
+        activities.ackEvents(events);
 
-                                // Iterate through batch of messages
-                                // Validate each message by type
-                                // Route valid messages to a child workflow 
-                                // Invalid messages are either retried or ignored depending on type
+        if (events.isArray()) {
+            List<Promise<String>> promises = new ArrayList<>();
+            Iterator<JsonNode> eventIterator = events.elements();
 
-                                Iterator<JsonNode> records = rootNode.elements();
-                                while (records.hasNext()) {
-                                        JsonNode record = records.next();
-                                        String eventType = record.path("header").path("eventType").asText();
-                                        String requestId = record.path("header").path("id").asText();
-                                        String correlationId = record.path("header").path("correlationId").asText();
-
-                                        // Validate the Event Type
-                                        String[] response = activities.validateRecord(eventType);
-                                        String responseCode = response[0];
-                                        
-                                        // If event type is valid, start a child workflow 
-                                        // to process transfer event activities
-                                        if ("TRANSFER_EVENT".equals(responseCode)) {
-                                                ChildWorkflowOptions childWorkflowOptions =
-                                                        ChildWorkflowOptions.newBuilder()
-                                                        .setWorkflowId("Transfer-Receipt-" + requestId)
-                                                        .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
-                                                        .build();
-                                                TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(TransferReceiptWorkflow.class, childWorkflowOptions);
-                                                System.out.println("Start Child Workflow to process Receipt Event");
-                                                receiptChildWorkflow.processEvents(record.toString());
-                                        }
-                                        
-                                        
-                                }
-
-                        } else {
-                                System.out.println("Input JSON is not an array. Ending workflow.");
-                        }
-                } catch (JsonProcessingException ex) {
-                        // Handle JSON processing exceptions
-                        log.error("Failed to process JSON: {}", ex.getMessage(), ex);
-                        // Provide user-friendly feedback or rethrow a custom exception
-                        throw ApplicationFailure.newFailure("An error occurred while processing the JSON data", ex.getMessage(), ex);
-                } 
-                // Handle other runtime exceptions
-                catch (RuntimeException ex) {
-                log.error("Runtime exception occurred: {}", ex.getMessage(), ex);
+            while (eventIterator.hasNext()) {
+                JsonNode event = eventIterator.next();
+                if (isTransferEvent(event)) {
+                    promises.add(startChildWorkflow(event));
+                    log.info("Started Child Workflow to process transfer receipt");
                 }
+            }
+
+            Promise.allOf(promises).get();
+        } else {
+            log.warn("Input JSON is not an array. Ending workflow.");
         }
 
+    }
+
+    private boolean isTransferEvent(JsonNode event) {
+        String eventType = event.path("header").path("eventType").asText();
+        String[] response = activities.filterEventType(eventType);
+        return "TRANSFER_EVENT".equals(response[0]);
+    }
+
+    private Promise<String> startChildWorkflow(JsonNode event) {
+        String requestId = event.path("header").path("id").asText();
+
+        ChildWorkflowOptions childWorkflowOptions = ChildWorkflowOptions.newBuilder()
+                .setWorkflowId("Transfer-Receipt-" + requestId)
+                .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
+                .build();
+
+        TransferReceiptWorkflow receiptChildWorkflow = Workflow.newChildWorkflowStub(TransferReceiptWorkflow.class, childWorkflowOptions);
+        return Async.function(receiptChildWorkflow::processEvent, event);
+    }
 }

@@ -1,5 +1,6 @@
 package temporal.inventory.receiptsusecase;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.temporal.workflow.WorkflowInterface;
 import io.temporal.workflow.WorkflowMethod;
 
@@ -7,6 +8,6 @@ import io.temporal.workflow.WorkflowMethod;
 @WorkflowInterface
 public interface TransferReceiptWorkflow {
   @WorkflowMethod
-  void processEvents(String eventData);
+  String processEvent(JsonNode eventData);
 
 }

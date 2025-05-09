@@ -14,16 +14,16 @@ public interface Activities {
     String processRecord(String eventType);
 
     @ActivityMethod
-    String[] validateRecord(String eventType);
+    String[] filterEventType(String eventType);
 
     @ActivityMethod
-    String ackEvents(String eventData);
+    String ackEvents(JsonNode eventData);
 
     @ActivityMethod
     String TransformToEventModel();
 
     @ActivityMethod
-    String validateEvents();
+    String validateEvents(JsonNode eventData);
 
     @ActivityMethod
     String publishEvents();
